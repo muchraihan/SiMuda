@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\DendaController; // Pastikan import ini ada
+use App\Http\Controllers\AdminPustakawanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +92,13 @@ Route::middleware(['auth', 'peran:pustakawan'])->prefix('pustakawan')->group(fun
     Route::get('/denda', [DendaController::class, 'index'])->name('pustakawan.denda.index');
     Route::patch('/denda/{id_denda}/lunas', [DendaController::class, 'lunas'])->name('pustakawan.denda.lunas');
 
+    // 7. Manajemen Akun Pustakawan
+    Route::get('/akun', [AdminPustakawanController::class, 'index'])->name('pustakawan.akun.index');
+    Route::get('/akun/create', [AdminPustakawanController::class, 'create'])->name('pustakawan.akun.create');
+    Route::post('/akun', [AdminPustakawanController::class, 'store'])->name('pustakawan.akun.store');
+    Route::delete('/akun/{id_user}', [AdminPustakawanController::class, 'destroy'])->name('pustakawan.akun.destroy');
+
+    
 });
 
 // Auth Routes (Login, Register, dll)

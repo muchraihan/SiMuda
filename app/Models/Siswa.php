@@ -14,4 +14,10 @@ class Siswa extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id_user');
     }
+
+    // Relasi ke Peminjaman
+    public function peminjaman()
+    {
+        return $this->hasMany(Peminjaman::class, 'id_siswa', 'id_siswa');
+    }
 }

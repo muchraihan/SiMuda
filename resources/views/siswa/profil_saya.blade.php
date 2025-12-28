@@ -62,7 +62,7 @@
                                 <label class="block text-gray-700 text-sm font-bold mb-2">Kelas Saat Ini</label>
                                 <input type="text" name="kelas" value="{{ old('kelas', $siswa->kelas) }}" required
                                     class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
-                                    placeholder="Contoh: XII RPL 1">
+                                    placeholder="Contoh: XI">
                             </div>
 
                             {{-- No WA (Editable) --}}

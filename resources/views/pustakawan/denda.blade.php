@@ -10,8 +10,52 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const flashData = document.getElementById('flash-data');
-        if (flashData.dataset.success) Swal.fire('Berhasil!', flashData.dataset.success, 'success');
-        if (flashData.dataset.error) Swal.fire('Gagal!', flashData.dataset.error, 'error');
+        const successMsg = flashData.dataset.success;
+        const errorMsg = flashData.dataset.error;
+
+        // Cek Pesan Sukses
+        if (successMsg) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#10B981',
+                confirmButtonText: 'Oke'
+            });
+        }
+
+        // Cek Pesan Error
+        if (errorMsg) {
+            Swal.fire({
+                title: 'Gagal!',
+                text: errorMsg,
+                icon: 'error',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
+        }
+
+        // Function untuk konfirmasi pembayaran denda
+        function confirmBayar(id, jumlah, namaSiswa, judulBuku) {
+            Swal.fire({
+                title: 'Konfirmasi Pembayaran',
+                html: `Konfirmasi pembayaran denda:<br><br>
+                       <strong>Siswa:</strong> ${namaSiswa}<br>
+                       <strong>Buku:</strong> ${judulBuku}<br>
+                       <strong>Jumlah Denda:</strong> Rp ${new Intl.NumberFormat('id-ID').format(jumlah)}<br><br>
+                       Apakah denda ini sudah dibayar lunas?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563EB',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'Ya, Sudah Dibayar',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`bayar-form-${id}`).submit();
+                }
+            });
+        }
     </script>
 
     <div class="py-12">
@@ -88,12 +132,12 @@
                                     
                                     <td class="py-3 px-4 text-center">
                                         @if($item->status_pembayaran == 'belum_bayar')
-                                            <form action="{{ route('pustakawan.denda.lunas', $item->id_denda) }}" method="POST">
+                                            <form id="bayar-form-{{ $item->id_denda }}" action="{{ route('pustakawan.denda.lunas', $item->id_denda) }}" method="POST">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" 
-                                                        class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3 rounded shadow transition"
-                                                        onclick="return confirm('Konfirmasi: Denda sebesar Rp {{ number_format($item->jumlah_denda) }} sudah dibayar lunas?')">
+                                                <button type="button" 
+                                                        onclick="confirmBayar({{ $item->id_denda }}, {{ $item->jumlah_denda }}, '{{ $item->peminjaman->siswa->user->name }}', '{{ $item->peminjaman->buku->judul }}')"
+                                                        class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1.5 px-3 rounded shadow transition">
                                                     Bayar
                                                 </button>
                                             </form>

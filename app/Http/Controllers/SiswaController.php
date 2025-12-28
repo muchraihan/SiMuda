@@ -110,6 +110,9 @@ class SiswaController extends Controller
         $siswa = Siswa::findOrFail($id_siswa);
         $user  = $siswa->user;
 
+        // Hapus semua peminjaman terkait siswa terlebih dahulu
+        $siswa->peminjaman()->delete();
+
         // Hapus User (Karena Cascade On Delete di database, data di tabel siswa otomatis ikut terhapus)
         // Jika tidak setting cascade di migration, hapus $siswa->delete() dulu baru $user->delete()
         if ($user) {

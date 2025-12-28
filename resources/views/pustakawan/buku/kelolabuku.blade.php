@@ -6,6 +6,67 @@
         </h2>
     </x-slot>
 
+    {{-- ============================================================== --}}
+    {{-- NOTIFIKASI SWEETALERT --}}
+    {{-- ============================================================== --}}
+    
+    <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
+    <div id="flash-data" 
+         data-success="{{ session('success') }}" 
+         data-error="{{ session('error') }}">
+    </div>
+
+    <!-- 2. Library SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- 3. Script JS Murni -->
+    <script>
+        const flashData = document.getElementById('flash-data');
+        const successMsg = flashData.dataset.success;
+        const errorMsg = flashData.dataset.error;
+
+        // Cek Pesan Sukses
+        if (successMsg) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#10B981',
+                confirmButtonText: 'Oke'
+            });
+        }
+
+        // Cek Pesan Error
+        if (errorMsg) {
+            Swal.fire({
+                title: 'Gagal!',
+                text: errorMsg,
+                icon: 'error',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
+        }
+
+        // Function untuk konfirmasi hapus buku
+        function confirmDelete(id, judul) {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: `Apakah Anda yakin ingin menghapus buku "${judul}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-form-${id}`).submit();
+                }
+            });
+        }
+    </script>
+    {{-- ============================================================== --}}
+
     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6 text-gray-900">
             
@@ -36,7 +97,7 @@
                                 &times;
                             </a>
                         @endif
-                        <button type="submit" class="bg-blue-500 hover:bg-green-600 text-white p-2 rounded">Cari</button>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded">Cari</button>
                     </div>
                 </form>
             </div>
@@ -77,10 +138,13 @@
                                         </a>
 
                                         {{-- Tombol Hapus --}}
-                                        <form action="{{ route('pustakawan.buku.destroy', $item->id_buku) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus buku ini?')">
+                                        <form id="delete-form-{{ $item->id_buku }}" action="{{ route('pustakawan.buku.destroy', $item->id_buku) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
+                                            <button type="button" 
+                                                    onclick="confirmDelete({{ $item->id_buku }}, '{{ $item->judul }}')"
+                                                    class="text-red-500 hover:text-red-700 p-1" 
+                                                    title="Hapus">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" 
                                                           d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" 

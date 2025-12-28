@@ -6,7 +6,7 @@
     </x-slot>
 
     <!-- ========================================== -->
-    <!-- 1. SCRIPT SWEETALERT (Agar Notifikasi Muncul) -->
+    <!-- 1. SCRIPT SWEETALERT (Notifikasi & Konfirmasi) -->
     <!-- ========================================== -->
     <div id="flash-data" 
          data-success="{{ session('success') }}" 
@@ -14,6 +14,7 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // A. Logika Notifikasi Sukses/Gagal (Dari Controller)
         const flashData = document.getElementById('flash-data');
         const successMsg = flashData.dataset.success;
         const errorMsg = flashData.dataset.error;
@@ -23,6 +24,25 @@
         }
         if (errorMsg) {
             Swal.fire({ title: 'Gagal!', text: errorMsg, icon: 'error', confirmButtonColor: '#EF4444', confirmButtonText: 'Tutup' });
+        }
+
+        // B. Logika Konfirmasi Pinjam (SweetAlert)
+        function confirmPinjam(formId, judulBuku) {
+            Swal.fire({
+                title: 'Konfirmasi Peminjaman',
+                text: "Apakah Anda yakin ingin meminjam buku \"" + judulBuku + "\"?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6', // Warna Biru
+                cancelButtonColor: '#d33',     // Warna Merah
+                confirmButtonText: 'Ya, Pinjam!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit form secara manual jika user klik Ya
+                    document.getElementById(formId).submit();
+                }
+            });
         }
     </script>
     <!-- ========================================== -->
@@ -47,6 +67,7 @@
                         {{-- KOLOM KIRI: Gambar Sampul --}}
                         <div class="w-full md:w-1/3 flex-shrink-0">
                             <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200 relative group">
+                                {{-- PERBAIKAN: Tetap menggunakan 'storage/' sesuai permintaan --}}
                                 @if ($book->url_sampul)
                                     <img src="{{ asset('storage/' . $book->url_sampul) }}" 
                                          alt="{{ $book->judul }}" 
@@ -116,14 +137,15 @@
                             {{-- Tombol Aksi --}}
                             <div class="mt-auto pt-6 border-t border-gray-100 flex items-center justify-end">
                                 @if($book->jumlah_stok > 0)
-                                    {{-- FORM PINJAM YANG SUDAH DIPERBAIKI --}}
+                                    {{-- FORM PINJAM DENGAN SWEETALERT --}}
                                     {{-- Arahkan ke route peminjaman.ajukan dengan ID Buku --}}
-                                    <form action="{{ route('peminjaman.ajukan', $book->id_buku) }}" method="POST">
+                                    <form action="{{ route('peminjaman.ajukan', $book->id_buku) }}" method="POST" id="form-pinjam-detail">
                                         @csrf
-                                        {{-- Input hidden tidak diperlukan karena ID dikirim lewat URL route --}}
-                                        <button type="submit" 
-                                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 flex items-center"
-                                            onclick="return confirm('Apakah kamu yakin ingin meminjam buku {{ $book->judul }}?')">
+                                        {{-- Ubah type tombol jadi 'button' agar tidak submit langsung --}}
+                                        {{-- Panggil fungsi confirmPinjam() --}}
+                                        <button type="button" 
+                                            onclick="confirmPinjam('form-pinjam-detail', '{{ $book->judul }}')"
+                                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>

@@ -54,10 +54,10 @@
                         Profil
                     </a>
 
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form" class="w-full">
                         @csrf
-                        <button type="submit" 
-                                onclick="return confirm('Yakin ingin keluar?')"
+                        <button type="button" 
+                                id="logout-btn"
                                 class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-gray-300 bg-gray-800 hover:bg-red-900/20 hover:text-red-400 hover:border-red-900/30 rounded-lg transition-all duration-200 border border-gray-700/50 group">
                             <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                             Keluar
@@ -83,6 +83,10 @@
                 <a href="{{ route('pustakawan.siswa.index') }}" class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group {{ request()->routeIs('pustakawan.siswa.*') ? 'bg-green-600 text-white shadow-lg shadow-green-900/20' : 'text-gray-400 hover:bg-white/5 hover:text-green-400' }}">
                     <svg class="w-5 h-5 mr-3 transition-transform group-hover:scale-110 {{ request()->routeIs('pustakawan.siswa.*') ? 'text-white' : 'text-gray-500 group-hover:text-green-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                     Data Siswa
+                </a>
+                <a href="{{ route('pustakawan.akun.index') }}" class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group {{ request()->routeIs('pustakawan.akun.*') ? 'bg-green-600 text-white shadow-lg shadow-green-900/20' : 'text-gray-400 hover:bg-white/5 hover:text-green-400' }}">
+                    <svg class="w-5 h-5 mr-3 transition-transform group-hover:scale-110 {{ request()->routeIs('pustakawan.akun.*') ? 'text-white' : 'text-gray-500 group-hover:text-green-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Data Pustakawan
                 </a>
                 <a href="{{ route('pustakawan.peminjaman') }}" class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group {{ request()->routeIs('pustakawan.peminjaman.*') ? 'bg-green-600 text-white shadow-lg shadow-green-900/20' : 'text-gray-400 hover:bg-white/5 hover:text-green-400' }}">
                     <svg class="w-5 h-5 mr-3 transition-transform group-hover:scale-110 {{ request()->routeIs('pustakawan.peminjaman.*') ? 'text-white' : 'text-gray-500 group-hover:text-green-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -118,5 +122,30 @@
             @endif
 
         </nav>
+    @endauth
+
+    {{-- Script SweetAlert untuk konfirmasi logout --}}
+    @auth
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin keluar dari akun?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('logout-form').submit();
+                }
+            });
+        });
+    </script>
     @endauth
 </aside>

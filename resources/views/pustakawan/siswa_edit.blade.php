@@ -5,6 +5,49 @@
         </h2>
     </x-slot>
 
+    {{-- ============================================================== --}}
+    {{-- NOTIFIKASI SWEETALERT --}}
+    {{-- ============================================================== --}}
+    
+    <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
+    <div id="flash-data" 
+         data-success="{{ session('success') }}" 
+         data-error="{{ session('error') }}">
+    </div>
+
+    <!-- 2. Library SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- 3. Script JS Murni -->
+    <script>
+        const flashData = document.getElementById('flash-data');
+        const successMsg = flashData.dataset.success;
+        const errorMsg = flashData.dataset.error;
+
+        // Cek Pesan Sukses
+        if (successMsg) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: successMsg,
+                icon: 'success',
+                confirmButtonColor: '#10B981',
+                confirmButtonText: 'Oke'
+            });
+        }
+
+        // Cek Pesan Error
+        if (errorMsg) {
+            Swal.fire({
+                title: 'Gagal!',
+                text: errorMsg,
+                icon: 'error',
+                confirmButtonColor: '#EF4444',
+                confirmButtonText: 'Tutup'
+            });
+        }
+    </script>
+    {{-- ============================================================== --}}
+
     <div class="py-12">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
             {{-- Tombol Kembali --}}
@@ -18,6 +61,18 @@
                 <form action="{{ route('pustakawan.siswa.update', $siswa->id_siswa) }}" method="POST">
                     @csrf
                     @method('PUT')
+
+                    {{-- Menampilkan Error Validasi --}}
+                    @if ($errors->any())
+                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                            <strong class="font-bold">Ada kesalahan!</strong>
+                            <ul class="mt-2 list-disc list-inside text-sm">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     {{-- Data Akun (Tabel User) --}}
                     <div class="mb-4">
@@ -43,9 +98,13 @@
                         </div>
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">Kelas</label>
-                            <input type="text" name="kelas" value="{{ old('kelas', $siswa->kelas) }}" required
-                                class="shadow-sm border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md w-full"
-                                placeholder="Contoh: XII RPL 1">
+                            <select name="kelas" required
+                                class="shadow-sm border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md w-full">
+                                <option value="">-- Pilih Kelas --</option>
+                                <option value="VII" {{ old('kelas', $siswa->kelas) == 'VII' ? 'selected' : '' }}>VII</option>
+                                <option value="VIII" {{ old('kelas', $siswa->kelas) == 'VIII' ? 'selected' : '' }}>VIII</option>
+                                <option value="IX" {{ old('kelas', $siswa->kelas) == 'IX' ? 'selected' : '' }}>IX</option>
+                            </select>
                         </div>
                     </div>
 

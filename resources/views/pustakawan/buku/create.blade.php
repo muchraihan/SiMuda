@@ -5,6 +5,49 @@
                 Tambah Buku
             </h2>
 
+            {{-- ============================================================== --}}
+            {{-- NOTIFIKASI SWEETALERT --}}
+            {{-- ============================================================== --}}
+            
+            <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
+            <div id="flash-data" 
+                 data-success="{{ session('success') }}" 
+                 data-error="{{ session('error') }}">
+            </div>
+
+            <!-- 2. Library SweetAlert -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+            <!-- 3. Script JS Murni -->
+            <script>
+                const flashData = document.getElementById('flash-data');
+                const successMsg = flashData.dataset.success;
+                const errorMsg = flashData.dataset.error;
+
+                // Cek Pesan Sukses
+                if (successMsg) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: successMsg,
+                        icon: 'success',
+                        confirmButtonColor: '#10B981',
+                        confirmButtonText: 'Oke'
+                    });
+                }
+
+                // Cek Pesan Error
+                if (errorMsg) {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: errorMsg,
+                        icon: 'error',
+                        confirmButtonColor: '#EF4444',
+                        confirmButtonText: 'Tutup'
+                    });
+                }
+            </script>
+            {{-- ============================================================== --}}
+
             <script>
                 function previewImage() {
                     const image = document.querySelector('#url_sampul');

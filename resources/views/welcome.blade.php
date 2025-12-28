@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'SiMuda') }} - Perpustakaan Digital</title>
+    <link rel="icon" href="{{ asset('storage/smuhduta.png') }}" type="image/png">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -12,8 +13,6 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- Fallback Tailwind CDN jika Vite belum di-build -->
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="antialiased bg-gray-50 text-gray-800 font-sans">
 
@@ -25,8 +24,8 @@
                 <div class="flex items-center">
                     <img src="{{ asset('storage/smuhduta.png') }}" alt="Logo" class="h-12 w-auto mr-3">
                     <div class="flex flex-col">
-                        <span class="text-2xl font-bold text-green-700 tracking-tight">SiMuda - SMP Muhammadiyah 2 Kartasura</span>
-                        <span class="text-xs text-gray-500 font-semibold tracking-wide">PERPUSTAKAAN DIGITAL</span>
+                        <span class="text-lg sm:text-2xl font-bold text-green-700 tracking-tight">SiMuda - SMP Muhammadiyah 2 Kartasura</span>
+                        <span class="text-xs sm:text-sm text-gray-500 font-semibold tracking-wide">PERPUSTAKAAN DIGITAL</span>
                     </div>
                 </div>
 
@@ -50,9 +49,34 @@
                         @endauth
                     @endif
                 </div>
+
+                {{-- Mobile menu button --}}
+                <div class="md:hidden flex items-center">
+                    <button id="nav-toggle" aria-label="Toggle menu" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
+
+    {{-- Mobile Auth Menu (hidden by default) --}}
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-b border-gray-100">
+        <div class="px-4 py-3 space-y-2">
+            @if (Route::has('login'))
+                @auth
+                    <a href="{{ url('/dashboard') }}" class="block text-sm font-bold text-gray-700 hover:text-green-600">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="block text-sm font-bold text-gray-700 hover:text-green-600">Masuk</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="block text-sm font-bold text-white bg-green-600 px-4 py-2 rounded-full text-center hover:bg-green-700">Daftar Sekarang</a>
+                    @endif
+                @endauth
+            @endif
+        </div>
+    </div>
 
     {{-- HERO SECTION --}}
     <div class="relative bg-white overflow-hidden">
@@ -172,7 +196,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     
                     {{-- Peta / Informasi Kiri --}}
-                <div class="rounded-lg overflow-hidden shadow-lg h-64 border border-gray-200 relative group">
+                <div class="rounded-lg overflow-hidden shadow-lg border border-gray-200 relative group">
                     {{-- Overlay judul saat di-hover --}}
                     <a href="https://maps.app.goo.gl/pBPF4JHqUfJ5R4ns5" target="_blank" class="absolute inset-0 z-10 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-300 flex items-center justify-center">
                         <span class="opacity-0 group-hover:opacity-100 bg-white text-gray-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm transition">
@@ -180,16 +204,17 @@
                         </span>
                     </a>
 
-                    {{-- Embed Google Maps: SMP Muhammadiyah 2 Kartasura --}}
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.152355557766!2d110.7485361741054!3d-7.558372374637651!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a14936d542385%3A0x62955f19069d4d23!2sSMP%20Muhammadiyah%202%20Kartasura!5e0!3m2!1sid!2sid!4v1715000000000!5m2!1sid!2sid" 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                    {{-- Responsive embed wrapper (16:9) --}}
+                    <div class="relative w-full" style="padding-top:56.25%;">
+                        <iframe 
+                            class="absolute inset-0 w-full h-full"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.152355557766!2d110.7485361741054!3d-7.558372374637651!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a14936d542385%3A0x62955f19069d4d23!2sSMP%20Muhammadiyah%202%20Kartasura!5e0!3m2!1sid!2sid!4v1715000000000!5m2!1sid!2sid" 
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
                 </div>
 
                 {{-- Kontak Kanan --}}
@@ -263,6 +288,17 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        (function(){
+            var btn = document.getElementById('nav-toggle');
+            var menu = document.getElementById('mobile-menu');
+            if(!btn || !menu) return;
+            btn.addEventListener('click', function(){
+                menu.classList.toggle('hidden');
+            });
+        })();
+    </script>
 
 </body>
 </html>
