@@ -19,13 +19,13 @@
     {{-- NAVBAR --}}
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-20 items-center">
+            <div class="flex justify-between h-16 md:h-20 items-center">
                 {{-- Logo Kiri --}}
-                <div class="flex items-center">
-                    <img src="{{ asset('storage/smuhduta.png') }}" alt="Logo" class="h-12 w-auto mr-3">
-                    <div class="flex flex-col">
-                        <span class="text-lg sm:text-2xl font-bold text-green-700 tracking-tight">SiMuda - SMP Muhammadiyah 2 Kartasura</span>
-                        <span class="text-xs sm:text-sm text-gray-500 font-semibold tracking-wide">PERPUSTAKAAN DIGITAL</span>
+                <div class="flex items-center min-w-0 flex-1">
+                    <img src="{{ asset('storage/smuhduta.png') }}" alt="Logo" class="h-8 md:h-10 lg:h-12 w-auto mr-2 md:mr-3 flex-shrink-0">
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-xs sm:text-sm md:text-lg lg:text-2xl font-bold text-green-700 tracking-tight truncate">SiMuda - SMP Muhammadiyah 2 Kartasura</span>
+                        <span class="text-xs sm:text-sm text-gray-500 font-semibold tracking-wide hidden sm:block">PERPUSTAKAAN DIGITAL</span>
                     </div>
                 </div>
 
@@ -208,7 +208,7 @@
                     <div class="relative w-full" style="padding-top:56.25%;">
                         <iframe 
                             class="absolute inset-0 w-full h-full"
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.152355557766!2d110.7485361741054!3d-7.558372374637651!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a14936d542385%3A0x62955f19069d4d23!2sSMP%20Muhammadiyah%202%20Kartasura!5e0!3m2!1sid!2sid!4v1715000000000!5m2!1sid!2sid" 
+                            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3955.152355557766!2d110.777779!3d-7.565376!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x679ba4d355a97924!2sSMP+Muhammadiyah+2+Kartasura!5e0!3m2!1sid!2sid!4v1735689600000!5m2!1sid!2sid" 
                             style="border:0;"
                             allowfullscreen=""
                             loading="lazy"

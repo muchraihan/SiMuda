@@ -15,13 +15,16 @@ class BukuController extends Controller
     {
         $search = trim($request->input('search'));
 
+        $perPage = $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
+
         $buku = Buku::when($search, function ($query, $search) {
             $query->where('judul', 'like', "%{$search}%")
                 ->orWhere('penulis', 'like', "%{$search}%")
                 ->orWhere('penerbit', 'like', "%{$search}%");
-        })->paginate(10);
+        })->paginate($perPage)->appends(['per_page' => $perPage, 'search' => $search]);
 
-        return view('pustakawan.buku.kelolabuku', compact('buku', 'search'));
+        return view('pustakawan.buku.kelolabuku', compact('buku', 'search', 'perPage'));
     }
 
     /**
@@ -66,7 +69,7 @@ class BukuController extends Controller
             'url_sampul' => $path,
         ]);
 
-        return redirect()->route('pustakawan.buku.index')->with('success', 'Buku berhasil ditambahkan!');
+        return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))->with('success', 'Buku berhasil ditambahkan!');
     }
 
     /**
@@ -116,7 +119,7 @@ class BukuController extends Controller
             'rak',
         ]));
 
-        return redirect()->route('pustakawan.buku.index')->with('success', 'Data buku berhasil diperbarui!');
+        return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))->with('success', 'Data buku berhasil diperbarui!');
     }
 
     /**
@@ -131,6 +134,6 @@ class BukuController extends Controller
         }
 
         $buku->delete();
-        return redirect()->route('pustakawan.buku.index')->with('success', 'Buku berhasil dihapus!');
+        return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))->with('success', 'Buku berhasil dihapus!');
     }
 }

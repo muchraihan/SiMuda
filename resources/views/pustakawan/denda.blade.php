@@ -42,7 +42,7 @@
                 html: `Konfirmasi pembayaran denda:<br><br>
                        <strong>Siswa:</strong> ${namaSiswa}<br>
                        <strong>Buku:</strong> ${judulBuku}<br>
-                       <strong>Jumlah Denda:</strong> Rp ${new Intl.NumberFormat('id-ID').format(jumlah)}<br><br>
+                       <strong>Jumlah Denda:</strong> Rp ${jumlah.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}<br><br>
                        Apakah denda ini sudah dibayar lunas?`,
                 icon: 'question',
                 showCancelButton: true,
@@ -115,7 +115,7 @@
                                     </td>
                                     
                                     <td class="py-3 px-4 font-bold text-red-600">
-                                        Rp {{ number_format($item->jumlah_denda, 0, ',', '.') }}
+                                        Rp {{ number_format($item->jumlah_denda, 0, '', '.') }}
                                     </td>
                                     
                                     <td class="py-3 px-4 text-center">

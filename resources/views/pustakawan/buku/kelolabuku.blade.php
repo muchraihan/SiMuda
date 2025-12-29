@@ -165,36 +165,49 @@
             </div>
 
             {{-- Bagian Paginasi (Navigasi Halaman) --}}
-            <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <span class="text-sm text-gray-600">
+            <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <span class="text-sm text-gray-600 order-2 sm:order-1">
                     Menampilkan <span class="font-semibold text-gray-800">{{ $buku->firstItem() }}</span>
                     sampai <span class="font-semibold text-gray-800">{{ $buku->lastItem() }}</span>
                     dari <span class="font-semibold text-gray-800">{{ $buku->total() }}</span> hasil
                 </span>
 
-                {{-- Navigasi Halaman --}}
-                <div class="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-lg shadow-inner">
-                    @if ($buku->onFirstPage())
-                        <span class="px-3 py-1 text-gray-400 cursor-not-allowed">&laquo;</span>
-                    @else
-                        <a href="{{ $buku->previousPageUrl() }}"
-                        class="px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&laquo;</a>
-                    @endif
+                {{-- Navigasi Halaman dan Pilihan Per Page --}}
+                <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 order-1 sm:order-2">
+                    <form action="{{ route('pustakawan.buku.index') }}" method="GET" class="flex items-center space-x-2">
+                        <input type="hidden" name="search" value="{{ $search ?? '' }}">
+                        <label for="per_page" class="text-sm text-gray-600 whitespace-nowrap">Tampilkan:</label>
+                        <select name="per_page" id="per_page" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-3 py-1 text-sm w-20 bg-white shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+                            <option value="10" {{ ($perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="20" {{ ($perPage ?? 10) == 20 ? 'selected' : '' }}>20</option>
+                            <option value="50" {{ ($perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ ($perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                    </form>
 
-                    @foreach ($buku->getUrlRange(1, $buku->lastPage()) as $page => $url)
-                        @if ($page == $buku->currentPage())
-                            <span class="px-3 py-1 bg-green-600 text-white font-semibold rounded-md">{{ $page }}</span>
+                    <div class="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-lg shadow-inner">
+                        @if ($buku->onFirstPage())
+                            <span class="px-3 py-1 text-gray-400 cursor-not-allowed">&laquo;</span>
                         @else
-                            <a href="{{ $url }}" class="px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">{{ $page }}</a>
+                            <a href="{{ $buku->previousPageUrl() }}"
+                            class="px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&laquo;</a>
                         @endif
-                    @endforeach
 
-                    @if ($buku->hasMorePages())
-                        <a href="{{ $buku->nextPageUrl() }}"
-                        class="px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&raquo;</a>
-                    @else
-                        <span class="px-3 py-1 text-gray-400 cursor-not-allowed">&raquo;</span>
-                    @endif
+                        @foreach ($buku->getUrlRange(1, $buku->lastPage()) as $page => $url)
+                            @if ($page == $buku->currentPage())
+                                <span class="px-3 py-1 bg-green-600 text-white font-semibold rounded-md">{{ $page }}</span>
+                            @else
+                                <a href="{{ $url }}" class="px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">{{ $page }}</a>
+                            @endif
+                        @endforeach
+
+                        @if ($buku->hasMorePages())
+                            <a href="{{ $buku->nextPageUrl() }}"
+                            class="px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&raquo;</a>
+                        @else
+                            <span class="px-3 py-1 text-gray-400 cursor-not-allowed">&raquo;</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 

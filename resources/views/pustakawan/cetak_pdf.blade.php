@@ -59,7 +59,7 @@
                 <td class="text-right">
                     @if($item->denda)
                         @php $totalDenda += $item->denda->jumlah_denda; @endphp
-                        <span class="text-red">Rp {{ number_format($item->denda->jumlah_denda, 0, ',', '.') }}</span>
+                        <span class="text-red">Rp {{ number_format($item->denda->jumlah_denda, 0, '', '.') }}</span>
                         <br>
                         <small style="font-size: 8px; color: #555;">
                             ({{ $item->denda->status_pembayaran == 'lunas' ? 'Lunas' : 'Belum' }})
@@ -74,7 +74,7 @@
             {{-- BARIS TOTAL --}}
             <tr>
                 <td colspan="8" class="text-right" style="font-weight: bold; background-color: #f9f9f9;">Total Pemasukan Denda Bulan Ini:</td>
-                <td class="text-right" style="font-weight: bold; background-color: #f9f9f9;">Rp {{ number_format($totalDenda, 0, ',', '.') }}</td>
+                <td class="text-right" style="font-weight: bold; background-color: #f9f9f9;">Rp {{ number_format($totalDenda, 0, '', '.') }}</td>
             </tr>
         </tbody>
     </table>

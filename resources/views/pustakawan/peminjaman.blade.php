@@ -227,13 +227,14 @@
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         {{-- FORM PENGEMBALIAN BUKU (SUDAH AKTIF) --}}
-                                        <form action="{{ route('peminjaman.kembalikan', $item->id_peminjaman) }}" method="POST">
+                                        <form id="form-kembali-{{ $item->id_peminjaman }}" action="{{ route('peminjaman.kembalikan', $item->id_peminjaman) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
                                             
-                                            <button type="submit" 
-                                                class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded text-sm flex items-center mx-auto space-x-1 transition shadow-md"
-                                                onclick="return confirm('Apakah buku {{ $item->buku->judul }} benar-benar sudah dikembalikan oleh siswa?')">
+                                            <button type="button" 
+                                                class="btn-kembali bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded text-sm flex items-center mx-auto space-x-1 transition shadow-md"
+                                                data-judul="{{ $item->buku->judul }}"
+                                                data-form="form-kembali-{{ $item->id_peminjaman }}">
                                                 
                                                 <!-- Ikon Refresh/Undo -->
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -266,5 +267,33 @@
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
+
+        // Script untuk konfirmasi pengembalian buku dengan SweetAlert
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnKembalis = document.querySelectorAll('.btn-kembali');
+            
+            btnKembalis.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const judulBuku = this.getAttribute('data-judul');
+                    const formId = this.getAttribute('data-form');
+                    const form = document.getElementById(formId);
+                    
+                    Swal.fire({
+                        title: 'Konfirmasi Pengembalian',
+                        text: `Apakah buku "${judulBuku}" benar-benar sudah dikembalikan oleh siswa?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#10B981',
+                        cancelButtonColor: '#6B7280',
+                        confirmButtonText: 'Ya, Kembalikan',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 </x-app-layout>
