@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         // 1. Buat Akun Pustakawan (Admin)
         User::create([
             'name' => 'Admin Pustakawan',
-            'email' => 'admin',
+            'email' => 'admin@gmail.com',
             'password' => Hash::make('admin111'), // Password default
             'peran' => 'pustakawan',
             'email_verified_at' => now(),
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
         // 2. Buat Akun Siswa 1
         User::create([
             'name' => 'siswa',
-            'email' => 'siswa',
+            'email' => 'siswa@gmail.com',
             'password' => Hash::make('siswa111'),
             'peran' => 'siswa',
             'email_verified_at' => now(),
