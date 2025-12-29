@@ -7,7 +7,7 @@ use App\Http\Controllers\KatalogBukuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\DendaController; // Pastikan import ini ada
+use App\Http\Controllers\DendaController;
 use App\Http\Controllers\AdminPustakawanController;
 
 /*
