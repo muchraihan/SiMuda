@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -129,11 +130,28 @@ class BukuController extends Controller
     {
         $buku = Buku::findOrFail($id_buku);
 
-        if ($buku->url_sampul) {
-            Storage::disk('public')->delete($buku->url_sampul);
+        // 1. Cek apakah buku sedang beredar (Dipinjam/Terlambat/Diajukan)
+        // Kalau statusnya 'kembali' atau 'ditolak', boleh dihapus.
+        $sedangDipinjam = Peminjaman::where('id_buku', $id_buku)
+            ->whereIn('status', ['diajukan', 'dipinjam', 'terlambat'])
+            ->exists();
+
+        if ($sedangDipinjam) {
+            return redirect()->back()
+                ->with('error', 'Gagal hapus! Buku sedang dipinjam atau diajukan oleh siswa. Harap selesaikan transaksinya dulu.');
         }
 
+        // 2. Hapus Buku (Soft Delete)
+        // Data tidak hilang dari database, tapi hilang dari aplikasi
         $buku->delete();
-        return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))->with('success', 'Buku berhasil dihapus!');
+
+        // Opsional: Jika ingin menghapus gambar sampulnya juga untuk menghemat ruang
+        // (Tapi saran saya biarkan saja jika ingin riwayat sampul tetap ada)
+        /* if ($buku->url_sampul && file_exists(public_path('images/buku/' . $buku->url_sampul))) {
+            unlink(public_path('images/buku/' . $buku->url_sampul));
+        }
+        */
+
+        return redirect()->back()->with('success', 'Buku berhasil dihapus (Diarsip). Riwayat peminjaman tetap aman.');
     }
 }
