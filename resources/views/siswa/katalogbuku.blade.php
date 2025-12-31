@@ -71,7 +71,7 @@
                 <form action="{{ route('katalog.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-4">
                     
                     {{-- Wrapper Input (Relative agar tombol X bisa absolute) --}}
-                    <div class="relative w-full sm:w-2/3">
+                    <div class="relative w-full sm:w-1/2">
                         <input type="text" 
                                name="search" 
                                value="{{ request('search') }}"
@@ -170,12 +170,60 @@
                 @endforelse
             </div>
 
-            {{-- Paginasi
-            @if ($books->hasPages())
-                <div class="mt-6 flex justify-center">
-                    {{ $books->appends(['search' => request('search')])->links() }}
+            {{-- Bagian Paginasi (Navigasi Halaman) --}}
+            @if ($books->total() > 0)
+                <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <span class="text-xs sm:text-sm text-gray-600 order-2 sm:order-1">
+                        Menampilkan <span class="font-semibold text-gray-800">{{ $books->firstItem() }}</span>
+                        sampai <span class="font-semibold text-gray-800">{{ $books->lastItem() }}</span>
+                        dari <span class="font-semibold text-gray-800">{{ $books->total() }}</span> hasil
+                    </span>
+
+                    {{-- Navigasi Halaman dan Pilihan Per Page --}}
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 order-1 sm:order-2">
+                        <form action="{{ route('katalog.index') }}" method="GET" class="flex items-center space-x-2">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                            <label for="per_page" class="text-sm text-gray-600 whitespace-nowrap">Tampilkan:</label>
+                            <select name="per_page" id="per_page" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-3 py-1 text-sm w-20 bg-white shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+                                <option value="10" {{ (request('per_page') ?? 10) == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ (request('per_page') ?? 10) == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ (request('per_page') ?? 10) == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ (request('per_page') ?? 10) == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                        </form>
+
+                        @if ($books->hasPages())
+                        <div class="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-lg shadow-inner overflow-x-auto">
+                            @if ($books->onFirstPage())
+                                <span class="px-2 sm:px-3 py-1 text-gray-400 cursor-not-allowed">&laquo;</span>
+                            @else
+                                <a href="{{ $books->previousPageUrl() }}"
+                                class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&laquo;</a>
+                            @endif
+
+                            @php
+                                $start = max(1, $books->currentPage() - 2);
+                                $end = min($books->lastPage(), $books->currentPage() + 2);
+                            @endphp
+                            @foreach ($books->getUrlRange($start, $end) as $page => $url)
+                                @if ($page == $books->currentPage())
+                                    <span class="px-2 sm:px-3 py-1 bg-green-600 text-white font-semibold rounded-md">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}" class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            @if ($books->hasMorePages())
+                                <a href="{{ $books->nextPageUrl() }}"
+                                class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&raquo;</a>
+                            @else
+                                <span class="px-2 sm:px-3 py-1 text-gray-400 cursor-not-allowed">&raquo;</span>
+                            @endif
+                        </div>
+                        @endif
+                    </div>
                 </div>
-            @endif --}}
+            @endif
 
         </div>
     </div>
