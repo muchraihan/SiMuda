@@ -69,7 +69,7 @@
                 @auth
                     <a href="{{ url('/dashboard') }}" class="block text-sm font-bold text-gray-700 hover:text-green-600">Dashboard</a>
                 @else
-                    <a href="{{ route('login') }}" class="block text-sm font-bold text-gray-700 hover:text-green-600">Masuk</a>
+                    <a href="{{ route('login') }}" class="block text-sm font-bold text-white bg-green-600 px-4 py-2 rounded-full text-center hover:bg-green-700">Masuk</a>
                     @if (Route::has('register'))
                         <a href="{{ route('register') }}" class="block text-sm font-bold text-white bg-green-600 px-4 py-2 rounded-full text-center hover:bg-green-700">Daftar Sekarang</a>
                     @endif

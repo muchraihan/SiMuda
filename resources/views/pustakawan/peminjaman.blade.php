@@ -7,45 +7,47 @@
     </x-slot>
 
     {{-- ============================================================== --}}
-    {{-- NOTIFIKASI SWEETALERT (ANTI ERROR VS CODE) --}}
+    {{-- NOTIFIKASI SWEETALERT --}}
     {{-- ============================================================== --}}
     
-    <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
     <div id="flash-data" 
          data-success="{{ session('success') }}" 
          data-error="{{ session('error') }}">
     </div>
 
-    <!-- 2. Library SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 3. Script JS Murni -->
     <script>
-        const flashData = document.getElementById('flash-data');
-        const successMsg = flashData.dataset.success;
-        const errorMsg = flashData.dataset.error;
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashData = document.getElementById('flash-data');
+            
+            // Cek apakah elemen ada sebelum mengakses dataset
+            if (flashData) {
+                const successMsg = flashData.dataset.success;
+                const errorMsg = flashData.dataset.error;
 
-        if (successMsg) {
-            Swal.fire({
-                title: 'Berhasil!',
-                text: successMsg,
-                icon: 'success',
-                confirmButtonColor: '#10B981', // Hijau Tailwind
-                confirmButtonText: 'Oke'
-            });
-        }
+                if (successMsg) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: successMsg,
+                        icon: 'success',
+                        confirmButtonColor: '#10B981',
+                        confirmButtonText: 'Oke'
+                    });
+                }
 
-        if (errorMsg) {
-            Swal.fire({
-                title: 'Gagal!',
-                text: errorMsg,
-                icon: 'error',
-                confirmButtonColor: '#EF4444', // Merah Tailwind
-                confirmButtonText: 'Tutup'
-            });
-        }
+                if (errorMsg) {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: errorMsg,
+                        icon: 'error',
+                        confirmButtonColor: '#EF4444',
+                        confirmButtonText: 'Tutup'
+                    });
+                }
+            }
+        });
     </script>
-    {{-- ============================================================== --}}
 
 
     {{-- Konten Utama Halaman --}}
@@ -114,18 +116,19 @@
                                                 </div>
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                {{-- Tombol Terima --}}
-                                                <form action="{{ route('peminjaman.acc', $req->id_peminjaman) }}" method="POST">
+                                                
+                                                {{-- Tombol Terima (FIXED: onsubmit langsung di form) --}}
+                                                <form action="{{ route('peminjaman.acc', $req->id_peminjaman) }}" method="POST" class="w-full sm:w-auto" onsubmit="return preventDoubleSubmit(this);">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                                                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition ease-in-out duration-150">
                                                         ✅ Setujui
                                                     </button>
                                                 </form>
 
                                                 {{-- Tombol Tolak --}}
-                                                <form action="{{ route('peminjaman.tolak', $req->id_peminjaman) }}" method="POST">
+                                                <form action="{{ route('peminjaman.tolak', $req->id_peminjaman) }}" method="POST" class="mt-3 sm:mt-0" onsubmit="return preventDoubleSubmit(this);">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                                                         ✖ Tolak
                                                     </button>
                                                 </form>
@@ -163,16 +166,9 @@
                     <div class="flex justify-end items-center mb-4">
                         <form action="{{ route('pustakawan.peminjaman') }}" method="GET" class="w-full sm:w-auto">
                             <div class="flex items-center space-x-2 relative">
+                                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari buku atau siswa..."
+                                    class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm pr-10">
                                 
-                                {{-- Input Search --}}
-                                <input type="text" 
-                                       name="search" 
-                                       placeholder="Cari buku atau siswa..."
-                                       value="{{ request('search') }}" 
-                                       class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm pr-10">
-                                
-                                {{-- Tombol X (Clear) --}}
-                                {{-- Hanya muncul jika ada request 'search' di URL --}}
                                 @if(request('search'))
                                     <a href="{{ route('pustakawan.peminjaman') }}" 
                                        class="absolute inset-y-0 right-[5.5rem] flex items-center pr-3 text-gray-400 hover:text-gray-600 font-bold text-xl transition"
@@ -181,7 +177,6 @@
                                     </a>
                                 @endif
 
-                                {{-- Tombol Cari --}}
                                 <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition">
                                     Cari
                                 </button>
@@ -217,7 +212,7 @@
                                     <td class="py-3 px-4">
                                         @if(now() > $item->tgl_kembali_maksimal)
                                             <span class="bg-red-200 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">
-                                                Terlambat {{ now()->diffInDays($item->tgl_kembali_maksimal) }} Hari
+                                                Terlambat {{ number_format(now()->diffInDays($item->tgl_kembali_maksimal)) }} hari
                                             </span>
                                         @else
                                             <span class="bg-blue-200 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">
@@ -226,17 +221,14 @@
                                         @endif
                                     </td>
                                     <td class="py-3 px-4 text-center">
-                                        {{-- FORM PENGEMBALIAN BUKU (SUDAH AKTIF) --}}
+                                        {{-- FORM PENGEMBALIAN BUKU --}}
                                         <form id="form-kembali-{{ $item->id_peminjaman }}" action="{{ route('peminjaman.kembalikan', $item->id_peminjaman) }}" method="POST">
-                                            @csrf
-                                            @method('PATCH')
+                                            @csrf @method('PATCH')
                                             
                                             <button type="button" 
                                                 class="btn-kembali bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-3 rounded text-sm flex items-center mx-auto space-x-1 transition shadow-md"
                                                 data-judul="{{ $item->buku->judul }}"
                                                 data-form="form-kembali-{{ $item->id_peminjaman }}">
-                                                
-                                                <!-- Ikon Refresh/Undo -->
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                 </svg>
@@ -259,7 +251,7 @@
         </div>
     </div>
 
-    {{-- Script Sederhana untuk Modal --}}
+    {{-- SCRIPTS --}}
     <script>
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
@@ -268,10 +260,35 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // Script untuk konfirmasi pengembalian buku dengan SweetAlert
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnKembalis = document.querySelectorAll('.btn-kembali');
+        // FUNGSI GLOBAL ANTI DOUBLE SUBMIT
+        function preventDoubleSubmit(form) {
+            // Cek apakah form sudah pernah disubmit
+            if (form.getAttribute('data-submitted') === 'true') {
+                return false; // Batalkan submit kedua
+            }
             
+            // Tandai form sedang disubmit
+            form.setAttribute('data-submitted', 'true');
+            
+            const btn = form.querySelector('button[type="submit"]');
+            if(btn) {
+                // Ubah tampilan agar user tahu sedang proses
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Memproses...';
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                
+                // Gunakan style pointer-events untuk mencegah klik manual
+                // Jangan gunakan disabled=true karena kadang form gagal kirim di beberapa browser
+                btn.style.pointerEvents = 'none';
+            }
+
+            return true; // Izinkan submit pertama
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Logic Konfirmasi Pengembalian (SweetAlert)
+            const btnKembalis = document.querySelectorAll('.btn-kembali');
             btnKembalis.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const judulBuku = this.getAttribute('data-judul');

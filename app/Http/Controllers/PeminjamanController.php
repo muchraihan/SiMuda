@@ -8,7 +8,7 @@ use App\Models\Buku;
 use App\Models\Siswa;
 use App\Models\Denda;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http; // <--- Import untuk kirim API WA
+use Illuminate\Support\Facades\Http; 
 use Carbon\Carbon; 
 use Barryvdh\DomPDF\Facade\Pdf; 
 
@@ -99,10 +99,17 @@ class PeminjamanController extends Controller
         return view('pustakawan.peminjaman', compact('permintaan', 'sedangDipinjam'));
     }
 
-    // --- [FITUR 1: KIRIM WA SAAT DISETUJUI DENGAN DELAY] ---
+    // --- [FITUR 1: KIRIM WA SAAT DISETUJUI] ---
     public function setujui($id_peminjaman)
     {
+        // Gunakan lockForUpdate jika trafik tinggi, tapi findOrFail cukup untuk skala sekolah
         $peminjaman = Peminjaman::with(['siswa.user', 'buku'])->findOrFail($id_peminjaman);
+
+        // [PENTING!] CEK STATUS DULU
+        // Jika status bukan 'diajukan' (misal sudah diproses request sebelumnya), tolak request ini.
+        if ($peminjaman->status !== 'diajukan') {
+            return back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
+        }
 
         if ($peminjaman->buku->jumlah_stok < 1) {
             return back()->with('error', 'Gagal menyetujui. Stok buku fisik habis.');
@@ -121,14 +128,12 @@ class PeminjamanController extends Controller
 
         // --- LOGIKA KIRIM WA (FONTEE) ---
         try {
-            // 1. Format Nomor HP (08xx -> 628xx)
             $target = $peminjaman->siswa->nomor_whatsapp;
             $target = preg_replace('/[^0-9]/', '', $target); 
             if (substr($target, 0, 1) == '0') {
                 $target = '62' . substr($target, 1);
             }
 
-            // 2. Pesan
             $namaSiswa = $peminjaman->siswa->user->name;
             $judulBuku = $peminjaman->buku->judul;
             $tglWajib  = $tglKembali->translatedFormat('d F Y');
@@ -141,11 +146,9 @@ class PeminjamanController extends Controller
                    . "Silakan ambil buku di perpustakaan. Harap kembalikan tepat waktu.\n"
                    . "_Salam, SiMuda_";
 
-            // [TAMBAHAN BARU] Jeda Waktu Acak (3-6 Detik) agar aman dari banned
-            // Browser akan loading sebentar saat ini berjalan
-            sleep(rand(3, 6)); 
+            // Tambahkan sleep agar loading terasa (visual cue untuk user bahwa sedang proses)
+            sleep(rand(2, 4));
 
-            // 3. Kirim Request
             Http::withoutVerifying()->withHeaders([
                 'Authorization' => env('FONTEE_TOKEN'),
             ])->post('https://api.fonnte.com/send', [
@@ -155,7 +158,7 @@ class PeminjamanController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            // Log error diam-diam, jangan hentikan proses controller
+            // Log error diam-diam
         }
 
         return back()->with('success', 'Peminjaman disetujui & Notifikasi WA dikirim!');
@@ -164,6 +167,12 @@ class PeminjamanController extends Controller
     public function tolak($id_peminjaman)
     {
         $peminjaman = Peminjaman::findOrFail($id_peminjaman);
+
+        // [PENTING!] CEK STATUS DULU
+        if ($peminjaman->status !== 'diajukan') {
+            return back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
+        }
+
         $peminjaman->update(['status' => 'ditolak']);
         return back()->with('success', 'Permintaan peminjaman ditolak.');
     }
@@ -172,8 +181,9 @@ class PeminjamanController extends Controller
     {
         $peminjaman = Peminjaman::findOrFail($id_peminjaman);
 
+        // Cek status agar tidak dikembalikan 2x (mengacaukan stok)
         if (!in_array($peminjaman->status, ['dipinjam', 'terlambat'])) {
-            return back()->with('error', 'Data tidak valid.');
+            return back()->with('error', 'Data tidak valid atau sudah dikembalikan.');
         }
 
         // --- LOGIKA HITUNG DENDA ---
@@ -183,21 +193,18 @@ class PeminjamanController extends Controller
 
         // Cek apakah pengembalian melebihi tanggal wajib?
         if ($tglKembali->gt($tglWajib)) {
-            // Hitung selisih hari (pembulatan ke atas)
             $jumlahHari = $tglKembali->diffInDays($tglWajib);
-            $totalDenda = $jumlahHari * 1000; // Rp 1.000 per hari
+            $totalDenda = $jumlahHari * 1000; 
 
-            // Simpan ke tabel Denda
             Denda::create([
                 'id_peminjaman' => $peminjaman->id_peminjaman,
                 'jumlah_denda'  => $totalDenda,
-                'status_pembayaran' => 'belum_bayar' // Default belum bayar
+                'status_pembayaran' => 'belum_bayar'
             ]);
 
             $pesanTambahan = " Terkena denda keterlambatan: Rp " . number_format($totalDenda, 0, ',', '.');
         }
 
-        // Update Peminjaman
         $peminjaman->update([
             'status' => 'dikembalikan',
             'tgl_pengembalian_aktual' => now(),
@@ -232,7 +239,6 @@ class PeminjamanController extends Controller
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
 
-        // [UPDATE DISINI] Tambahkan 'denda' di dalam array with
         $laporan = Peminjaman::with(['siswa.user', 'buku', 'denda']) 
                     ->whereMonth('tgl_pinjam', $bulan)
                     ->whereYear('tgl_pinjam', $tahun)
