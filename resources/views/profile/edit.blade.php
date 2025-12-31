@@ -56,7 +56,7 @@
             });
         }
 
-        // Cek Pesan Error
+        // Cek Pesan Error (Misal: Gagal Hapus Akun karena masih pinjam buku)
         if (errorMsg) {
             Swal.fire({
                 title: 'Gagal!',
@@ -72,21 +72,23 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
-            {{-- Update Profil --}}
+            {{-- Update Profil (Border Hijau) --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg border border-gray-200 border-t-4 border-t-green-500">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            {{-- Update Password --}}
+            {{-- Update Password (Border Biru) --}}
+            {{-- Saya hapus 'dark:bg-gray-800' agar backgroundnya Putih Bersih --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg border border-gray-200 border-t-4 border-t-blue-500">
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            {{-- Delete User --}}
+            {{-- Delete User (Border Merah) --}}
+            {{-- Saya hapus 'dark:bg-gray-800' agar backgroundnya Putih Bersih --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg border border-gray-200 border-t-4 border-t-red-500">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')

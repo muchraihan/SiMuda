@@ -1,11 +1,11 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-bold text-gray-900">
             {{ __('Hapus Akun') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __('Setelah akun Anda dihapus, semua sumber daya dan data akan dihapus secara permanen. Sebelum menghapus akun, silakan unduh data atau informasi yang ingin Anda simpan.') }}
+            {{ __('Setelah akun dihapus, semua data akan hilang permanen. Pastikan Anda tidak memiliki tanggungan peminjaman buku sebelum menghapus akun.') }}
         </p>
     </header>
 
@@ -19,12 +19,12 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-medium text-gray-900">
-                {{ __('Apakah Anda yakin ingin menghapus akun Anda?') }}
+            <h2 class="text-lg font-bold text-gray-900">
+                {{ __('Apakah Anda yakin ingin menghapus akun?') }}
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                {{ __('Setelah akun Anda dihapus, semua sumber daya dan data akan dihapus secara permanen. Silakan masukkan password Anda untuk mengonfirmasi bahwa Anda ingin menghapus akun secara permanen.') }}
+                {{ __('Tindakan ini tidak dapat dibatalkan. Masukkan password Anda untuk konfirmasi penghapusan.') }}
             </p>
 
             <div class="mt-6">
@@ -46,7 +46,7 @@
                     {{ __('Batal') }}
                 </x-secondary-button>
 
-                <x-danger-button class="ms-3">
+                <x-danger-button class="ms-3 bg-red-600 hover:bg-red-700">
                     {{ __('Hapus Akun') }}
                 </x-danger-button>
             </div>
