@@ -8,61 +8,65 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
-class SendOverdueNotification extends Command
+class KirimNotifikasiTerlambat extends Command
 {
+    /**
+     * Nama perintah console
+     */
     protected $signature = 'notifikasi:kirim';
 
-    protected $description = 'Kirim notifikasi WA ke siswa yang terlambat mengembalikan buku';
+    protected $description = 'Kirim notifikasi WA ke siswa yang terlambat (Pengingat Harian)';
 
     public function handle()
     {
-        // Log penanda mulai (Cek storage/logs/laravel.log)
-        Log::info('🤖 BOT WA: Memulai pengecekan keterlambatan...');
+        Log::info('🤖 BOT WA: Memulai pengecekan harian...');
 
+        // 1. Cari SEMUA siswa yang terlambat
+        // PERUBAHAN: Saya MENGHAPUS ->where('notifikasi_terkirim', false)
+        // Agar pesan dikirim berulang setiap kali perintah ini dijalankan.
         $terlambat = Peminjaman::with(['siswa.user', 'buku'])
             ->whereIn('status', ['dipinjam', 'terlambat'])
-            ->whereDate('tgl_kembali_maksimal', '<', Carbon::now())
-            ->where('notifikasi_terkirim', false)
+            ->whereDate('tgl_kembali_maksimal', '<', Carbon::now()) // Hanya yang sudah lewat tanggal
             ->get();
 
         if ($terlambat->isEmpty()) {
-            Log::info('✅ BOT WA: Tidak ada siswa yang perlu dinotifikasi hari ini.');
+            Log::info('✅ BOT WA: Tidak ada siswa yang terlambat hari ini.');
             return;
         }
 
         $total = $terlambat->count();
-        Log::info("found: Ditemukan $total siswa terlambat. Memulai pengiriman...");
+        Log::info("found: Ditemukan $total siswa terlambat. Mengirim pengingat harian...");
 
         foreach ($terlambat as $index => $item) {
             
             try {
-                // 1. Format Nomor
+                // Format Nomor
                 $target = $item->siswa->nomor_whatsapp;
                 $target = preg_replace('/[^0-9]/', '', $target);
                 if (substr($target, 0, 1) === '0') $target = '62' . substr($target, 1);
 
-                // 2. Siapkan Data
                 $nama = $item->siswa->user->name;
                 $buku = $item->buku->judul;
                 $tgl  = Carbon::parse($item->tgl_kembali_maksimal)->translatedFormat('d F Y');
                 
                 // Hitung Telat & Denda
                 $telat = Carbon::now()->diffInDays($item->tgl_kembali_maksimal);
-                $telatFormatted = number_format($telat);
                 $denda = $telat * 1000; 
                 $dendaFormatted = number_format($denda, 0, ',', '.');
 
-                $pesan = "*PERINGATAN DENDA & KETERLAMBATAN* ⚠️\n\n"
+                // Pesan sedikit diubah agar cocok untuk pengingat harian
+                $pesan = "*PENGINGAT HARIAN* 🔔\n\n"
                        . "Halo *$nama*,\n"
-                       . "Masa peminjaman buku Anda telah HABIS.\n\n"
-                       . "📚 Buku: *$buku*\n"
+                       . "Ini adalah pengingat otomatis bahwa buku yang Anda pinjam:\n\n"
+                       . "📚 Judul: *$buku*\n"
                        . "📅 Jatuh Tempo: *$tgl*\n"
                        . "❗ Telat: *$telat Hari*\n"
-                       . "💰 *Estimasi Denda: Rp $dendaFormatted*\n\n"
-                       . "Mohon segera kembalikan buku ke perpustakaan.\n"
+                       . "💰 *Total Denda: Rp $dendaFormatted*\n\n"
+                       . "Mohon **SEGERA** kembalikan buku ke perpustakaan.\n"
+                       . "Pesan ini akan terus dikirim setiap hari sampai buku dikembalikan.\n\n"
                        . "_SiMuda Library_";
 
-                // 3. Kirim WA
+                // Kirim WA
                 $response = Http::withoutVerifying()->withHeaders([
                     'Authorization' => env('FONTEE_TOKEN'),
                 ])->post('https://api.fonnte.com/send', [
@@ -72,21 +76,21 @@ class SendOverdueNotification extends Command
                 ]);
 
                 if ($response->successful()) {
-                    Log::info("✅ BOT WA: Terkirim ke $nama");
+                    Log::info("✅ BOT WA: Pengingat terkirim ke $nama");
                     
-                    $item->update([
-                        'status' => 'terlambat',
-                        'notifikasi_terkirim' => true 
-                    ]);
-
-                    // Jeda Waktu (Agar tidak dianggap spam)
+                    // Pastikan status diupdate jadi terlambat (jika belum)
+                    if ($item->status !== 'terlambat') {
+                        $item->update(['status' => 'terlambat']);
+                    }
+                    
+                    // Jeda Waktu Random (Safety Anti-Banned)
                     if ($index < $total - 1) {
-                        $jeda = rand(4, 8); 
+                        $jeda = rand(5, 10); // Jeda agak lama sedikit biar aman
                         sleep($jeda); 
                     }
                     
                 } else {
-                    Log::error("❌ BOT WA: Gagal kirim ke $nama. API Response: " . $response->body());
+                    Log::error("❌ BOT WA: Gagal kirim ke $nama. API: " . $response->body());
                 }
 
             } catch (\Exception $e) {

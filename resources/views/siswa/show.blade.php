@@ -67,7 +67,6 @@
                         {{-- KOLOM KIRI: Gambar Sampul --}}
                         <div class="w-full md:w-1/3 flex-shrink-0">
                             <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200 relative group">
-                                {{-- PERBAIKAN: Tetap menggunakan 'storage/' sesuai permintaan --}}
                                 @if ($book->url_sampul)
                                     <img src="{{ asset('storage/' . $book->url_sampul) }}" 
                                          alt="{{ $book->judul }}" 
@@ -126,10 +125,16 @@
                                 </div>
                             </div>
 
-                            {{-- Deskripsi --}}
+                            {{-- Deskripsi (DENGAN SCROLL) --}}
                             <div class="mb-8">
                                 <h3 class="text-lg font-bold text-gray-900 mb-3 border-b pb-2">Deskripsi Buku</h3>
-                                <div class="text-gray-700 leading-relaxed text-justify space-y-4">
+                                {{-- 
+                                    UPDATE: 
+                                    - max-h-60: Tinggi maksimal sekitar 240px
+                                    - overflow-y-auto: Scroll vertikal jika teks panjang
+                                    - p-4 bg-gray-50: Padding dan background agar terlihat seperti kotak teks
+                                --}}
+                                <div class="text-gray-700 leading-relaxed text-justify space-y-4 max-h-60 overflow-y-auto p-4 bg-gray-50 rounded-lg border border-gray-200 custom-scrollbar">
                                     {!! nl2br(e($book->deskripsi ?? 'Tidak ada deskripsi.')) !!}
                                 </div>
                             </div>
@@ -137,12 +142,9 @@
                             {{-- Tombol Aksi --}}
                             <div class="mt-auto pt-6 border-t border-gray-100 flex items-center justify-end">
                                 @if($book->jumlah_stok > 0)
-                                    {{-- FORM PINJAM DENGAN SWEETALERT --}}
-                                    {{-- Arahkan ke route peminjaman.ajukan dengan ID Buku --}}
+                                    {{-- FORM PINJAM --}}
                                     <form action="{{ route('peminjaman.ajukan', $book->id_buku) }}" method="POST" id="form-pinjam-detail">
                                         @csrf
-                                        {{-- Ubah type tombol jadi 'button' agar tidak submit langsung --}}
-                                        {{-- Panggil fungsi confirmPinjam() --}}
                                         <button type="button" 
                                             onclick="confirmPinjam('form-pinjam-detail', '{{ $book->judul }}')"
                                             class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 flex items-center">

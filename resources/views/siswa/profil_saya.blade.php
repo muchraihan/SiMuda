@@ -60,9 +60,16 @@
                             {{-- Kelas (Editable) --}}
                             <div>
                                 <label class="block text-gray-700 text-sm font-bold mb-2">Kelas Saat Ini</label>
-                                <input type="text" name="kelas" value="{{ old('kelas', $siswa->kelas) }}" required
-                                    class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
-                                    placeholder="Contoh: XI">
+                                <select name="kelas" required
+                                    class="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
+                                    {{-- Tampilkan kelas saat ini sebagai default --}}
+                                    <option value="{{ $siswa->kelas }}" selected>{{ $siswa->kelas }} (Saat Ini)</option>
+                                    <option disabled>──────────</option>
+                                    
+                                    <option value="VII">VII</option>
+                                    <option value="VIII">VIII</option>
+                                    <option value="IX">IX</option>
+                                </select>
                             </div>
 
                             {{-- No WA (Editable) --}}
