@@ -153,12 +153,13 @@
                         <div class="pt-2">
                             <button type="submit"
                                     class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-lg hover:shadow-green-500/30 transform hover:-translate-y-0.5">
-                                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                                    <svg class="h-5 w-5 text-green-500 group-hover:text-green-400 transition duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                Daftar Sekarang
+                                {{-- Icon Panah Kanan --}}
+                                <span class="absolute right-0 inset-y-0 flex items-center pr-3">
+                                    <svg class="h-5 w-5 text-green-500 group-hover:text-green-300 transition duration-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </span>
-                                Daftar Sekarang
                             </button>
                         </div>
                     </form>

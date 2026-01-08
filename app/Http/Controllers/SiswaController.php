@@ -47,6 +47,9 @@ class SiswaController extends Controller
     {
         $search = $request->input('search');
 
+        $perPage = $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
+
         $siswa = Siswa::with('user') // Ambil data user (nama/email) sekalian
             ->when($search, function ($query, $search) {
                 return $query->where('nis', 'like', "%{$search}%")
@@ -57,9 +60,9 @@ class SiswaController extends Controller
                              });
             })
             ->orderBy('kelas', 'asc') // Urutkan berdasarkan kelas
-            ->paginate(10); // Batasi 10 baris per halaman
+            ->paginate($perPage)->appends(['per_page' => $perPage, 'search' => $search]);
 
-        return view('pustakawan.siswa', compact('siswa'));
+        return view('pustakawan.siswa', compact('siswa', 'search', 'perPage'));
     }
 
     public function edit($id_siswa)

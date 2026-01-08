@@ -12,6 +12,9 @@ class DendaController extends Controller
     {
         $search = $request->input('search');
 
+        $perPage = $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
+
         // Ambil data denda beserta relasi ke peminjaman -> siswa -> user & buku
         $dataDenda = Denda::with(['peminjaman.siswa.user', 'peminjaman.buku'])
             ->when($search, function ($query, $search) {
@@ -22,9 +25,9 @@ class DendaController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc') // Tampilkan yang terbaru dulu
-            ->paginate(10);
+            ->paginate($perPage)->appends(['per_page' => $perPage, 'search' => $search]);
 
-        return view('pustakawan.denda', compact('dataDenda'));
+        return view('pustakawan.denda', compact('dataDenda', 'search', 'perPage'));
     }
 
     // Method untuk mengubah status jadi Lunas

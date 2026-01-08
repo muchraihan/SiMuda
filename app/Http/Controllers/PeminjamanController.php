@@ -75,12 +75,17 @@ class PeminjamanController extends Controller
     public function indexPustakawan(Request $request)
     {
         $search = $request->input('search');
+        // Ambil input per_page, default 10 jika tidak ada
+        $perPage = $request->input('per_page', 10); 
 
+        // 1. TABEL ATAS (Approval) - Tetap ambil semua (tanpa paginasi)
+        // Karena biasanya jumlah yang minta acc tidak sampai ratusan sekaligus.
         $permintaan = Peminjaman::with(['siswa.user', 'buku'])
                         ->where('status', 'diajukan')
                         ->orderBy('tgl_pengajuan', 'asc')
                         ->get();
 
+        // 2. TABEL BAWAH (Monitoring) - GUNAKAN PAGINASI
         $sedangDipinjam = Peminjaman::with(['siswa.user', 'buku'])
                         ->whereIn('status', ['dipinjam', 'terlambat'])
                         ->when($search, function ($query, $search) {
@@ -94,7 +99,10 @@ class PeminjamanController extends Controller
                             });
                         })
                         ->orderBy('tgl_pinjam', 'desc')
-                        ->get();
+                        // Ganti get() menjadi paginate()
+                        ->paginate($perPage) 
+                        // Tambahkan appends agar search & filter tidak hilang saat ganti halaman
+                        ->appends(['search' => $search, 'per_page' => $perPage]);
 
         return view('pustakawan.peminjaman', compact('permintaan', 'sedangDipinjam'));
     }
@@ -224,14 +232,17 @@ class PeminjamanController extends Controller
         $bulan = $request->input('bulan', date('m'));
         $tahun = $request->input('tahun', date('Y'));
 
+        $perPage = $request->input('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
+
         $laporan = Peminjaman::with(['siswa.user', 'buku'])
                     ->whereMonth('tgl_pinjam', $bulan)
                     ->whereYear('tgl_pinjam', $tahun)
                     ->whereIn('status', ['dipinjam', 'dikembalikan', 'terlambat'])
                     ->orderBy('tgl_pinjam', 'desc')
-                    ->get();
+                    ->paginate($perPage)->appends(['per_page' => $perPage, 'bulan' => $bulan, 'tahun' => $tahun]);
 
-        return view('pustakawan.laporan', compact('laporan', 'bulan', 'tahun'));
+        return view('pustakawan.laporan', compact('laporan', 'bulan', 'tahun', 'perPage'));
     }
 
     public function cetakPdf(Request $request)

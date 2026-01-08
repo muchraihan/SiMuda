@@ -21,29 +21,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             const flashData = document.getElementById('flash-data');
             
-            // Cek apakah elemen ada sebelum mengakses dataset
             if (flashData) {
                 const successMsg = flashData.dataset.success;
                 const errorMsg = flashData.dataset.error;
 
                 if (successMsg) {
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        text: successMsg,
-                        icon: 'success',
-                        confirmButtonColor: '#10B981',
-                        confirmButtonText: 'Oke'
-                    });
+                    Swal.fire({ title: 'Berhasil!', text: successMsg, icon: 'success', confirmButtonColor: '#10B981', confirmButtonText: 'Oke' });
                 }
-
                 if (errorMsg) {
-                    Swal.fire({
-                        title: 'Gagal!',
-                        text: errorMsg,
-                        icon: 'error',
-                        confirmButtonColor: '#EF4444',
-                        confirmButtonText: 'Tutup'
-                    });
+                    Swal.fire({ title: 'Gagal!', text: errorMsg, icon: 'error', confirmButtonColor: '#EF4444', confirmButtonText: 'Tutup' });
                 }
             }
         });
@@ -54,7 +40,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- BAGIAN 1: TABEL APPROVAL (PERMINTAAN MASUK) --}}
+            {{-- BAGIAN 1: TABEL APPROVAL (TIDAK ADA PAGINASI SESUAI REQUEST) --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-yellow-400">
                 <div class="p-6 text-gray-900">
                     <div class="flex justify-between items-center mb-4">
@@ -117,15 +103,13 @@
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                                 
-                                                {{-- Tombol Terima (FIXED: onsubmit langsung di form) --}}
-                                                <form action="{{ route('peminjaman.acc', $req->id_peminjaman) }}" method="POST" class="w-full sm:w-auto" onsubmit="return preventDoubleSubmit(this);">
+                                                <form action="{{ route('peminjaman.acc', $req->id_peminjaman) }}" method="POST" class="form-acc w-full sm:w-auto" onsubmit="return preventDoubleSubmit(this);">
                                                     @csrf @method('PATCH')
                                                     <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition ease-in-out duration-150">
                                                         ✅ Setujui
                                                     </button>
                                                 </form>
 
-                                                {{-- Tombol Tolak --}}
                                                 <form action="{{ route('peminjaman.tolak', $req->id_peminjaman) }}" method="POST" class="mt-3 sm:mt-0" onsubmit="return preventDoubleSubmit(this);">
                                                     @csrf @method('PATCH')
                                                     <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
@@ -133,7 +117,6 @@
                                                     </button>
                                                 </form>
                                                 
-                                                {{-- Tombol Batal --}}
                                                 <button type="button" onclick="closeModal('modal-{{ $req->id_peminjaman }}')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                                                     Batal
                                                 </button>
@@ -155,7 +138,7 @@
             </div>
 
 
-            {{-- BAGIAN 2: TABEL MONITORING (SEDANG DIPINJAM) --}}
+            {{-- BAGIAN 2: TABEL MONITORING (ADA PAGINASI STYLE KATALOG) --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
@@ -200,7 +183,9 @@
                             <tbody class="text-gray-700">
                                 @forelse($sedangDipinjam as $index => $item)
                                 <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="py-3 px-4">{{ $index + 1 }}</td>
+                                    {{-- Penomoran mengikuti paginasi --}}
+                                    <td class="py-3 px-4">{{ $index + $sedangDipinjam->firstItem() }}</td>
+                                    
                                     <td class="py-3 px-4 font-medium">{{ $item->buku->judul }}</td>
                                     <td class="py-3 px-4">
                                         {{ $item->siswa->user->name }}
@@ -210,9 +195,9 @@
                                         {{ \Carbon\Carbon::parse($item->tgl_kembali_maksimal)->format('d-m-Y') }}
                                     </td>
                                     <td class="py-3 px-4">
-                                        @if(now() > $item->tgl_kembali_maksimal)
+                                        @if(now()->greaterThan($item->tgl_kembali_maksimal))
                                             <span class="bg-red-200 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">
-                                                Terlambat {{ number_format(now()->diffInDays($item->tgl_kembali_maksimal)) }} hari
+                                                terlambat {{ intval(\Carbon\Carbon::parse($item->tgl_kembali_maksimal)->diffInDays(now())) }} hari
                                             </span>
                                         @else
                                             <span class="bg-blue-200 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">
@@ -221,7 +206,6 @@
                                         @endif
                                     </td>
                                     <td class="py-3 px-4 text-center">
-                                        {{-- FORM PENGEMBALIAN BUKU --}}
                                         <form id="form-kembali-{{ $item->id_peminjaman }}" action="{{ route('peminjaman.kembalikan', $item->id_peminjaman) }}" method="POST">
                                             @csrf @method('PATCH')
                                             
@@ -245,6 +229,69 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- ============================================================== --}}
+                    {{-- PAGINASI STYLE KATALOG BUKU --}}
+                    {{-- ============================================================== --}}
+                    @if ($sedangDipinjam->total() > 0)
+                        <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                            <span class="text-xs sm:text-sm text-gray-600 order-2 sm:order-1">
+                                Menampilkan <span class="font-semibold text-gray-800">{{ $sedangDipinjam->firstItem() }}</span>
+                                sampai <span class="font-semibold text-gray-800">{{ $sedangDipinjam->lastItem() }}</span>
+                                dari <span class="font-semibold text-gray-800">{{ $sedangDipinjam->total() }}</span> data
+                            </span>
+
+                            {{-- Navigasi Halaman dan Pilihan Per Page --}}
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 order-1 sm:order-2">
+                                <form action="{{ route('pustakawan.peminjaman') }}" method="GET" class="flex items-center space-x-2">
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                    <label for="per_page" class="text-sm text-gray-600 whitespace-nowrap">Tampilkan:</label>
+                                    <select name="per_page" id="per_page" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-3 py-1 text-sm w-20 bg-white shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-500">
+                                        <option value="10" {{ (request('per_page') ?? 10) == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="25" {{ (request('per_page') ?? 10) == 25 ? 'selected' : '' }}>25</option>
+                                        <option value="50" {{ (request('per_page') ?? 10) == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ (request('per_page') ?? 10) == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
+                                </form>
+
+                                @if ($sedangDipinjam->total() > 0)
+                                <div class="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-lg shadow-inner overflow-x-auto max-w-[90vw] sm:max-w-none no-scrollbar">
+                                    {{-- Tombol Previous --}}
+                                    @if ($sedangDipinjam->onFirstPage())
+                                        <span class="px-2 sm:px-3 py-1 text-gray-400 cursor-not-allowed">&laquo;</span>
+                                    @else
+                                        <a href="{{ $sedangDipinjam->previousPageUrl() }}"
+                                        class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&laquo;</a>
+                                    @endif
+
+                                    {{-- Logic Nomor Halaman (Smart Range) --}}
+                                    @php
+                                        $start = max(1, $sedangDipinjam->currentPage() - 1);
+                                        $end = min($sedangDipinjam->lastPage(), $sedangDipinjam->currentPage() + 1);
+                                    @endphp
+                                    
+                                    @foreach ($sedangDipinjam->getUrlRange($start, $end) as $page => $url)
+                                        @if ($page == $sedangDipinjam->currentPage())
+                                            <span class="px-2 sm:px-3 py-1 bg-green-600 text-white font-semibold rounded-md">{{ $page }}</span>
+                                        @else
+                                            <a href="{{ $url }}" class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">{{ $page }}</a>
+                                        @endif
+                                    @endforeach
+
+                                    {{-- Tombol Next --}}
+                                    @if ($sedangDipinjam->hasMorePages())
+                                        <a href="{{ $sedangDipinjam->nextPageUrl() }}"
+                                        class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">&raquo;</a>
+                                    @else
+                                        <span class="px-2 sm:px-3 py-1 text-gray-400 cursor-not-allowed">&raquo;</span>
+                                    @endif
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                    {{-- ============================================================== --}}
+
                 </div>
             </div>
 
@@ -262,32 +309,19 @@
 
         // FUNGSI GLOBAL ANTI DOUBLE SUBMIT
         function preventDoubleSubmit(form) {
-            // Cek apakah form sudah pernah disubmit
-            if (form.getAttribute('data-submitted') === 'true') {
-                return false; // Batalkan submit kedua
-            }
-            
-            // Tandai form sedang disubmit
+            if (form.getAttribute('data-submitted') === 'true') return false;
             form.setAttribute('data-submitted', 'true');
-            
             const btn = form.querySelector('button[type="submit"]');
             if(btn) {
-                // Ubah tampilan agar user tahu sedang proses
-                const originalText = btn.innerHTML;
                 btn.innerHTML = '⏳ Memproses...';
                 btn.classList.add('opacity-75', 'cursor-not-allowed');
-                
-                // Gunakan style pointer-events untuk mencegah klik manual
-                // Jangan gunakan disabled=true karena kadang form gagal kirim di beberapa browser
                 btn.style.pointerEvents = 'none';
             }
-
-            return true; // Izinkan submit pertama
+            return true; 
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            
-            // Logic Konfirmasi Pengembalian (SweetAlert)
+            // Logic Konfirmasi Pengembalian
             const btnKembalis = document.querySelectorAll('.btn-kembali');
             btnKembalis.forEach(btn => {
                 btn.addEventListener('click', function() {

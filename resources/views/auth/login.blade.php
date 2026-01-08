@@ -18,10 +18,11 @@
 </head>
 <body class="font-sans antialiased bg-white">
 
-    <div class="min-h-screen flex">
+    {{-- WRAPPER UTAMA: h-screen (tinggi layar pas) & overflow-hidden (hilangkan scroll body) --}}
+    <div class="h-screen flex overflow-hidden">
         
-        <!-- BAGIAN KIRI: GAMBAR & BRANDING (Hanya tampil di layar besar) -->
-        <div class="hidden lg:flex w-1/2 bg-green-900 items-center justify-center relative overflow-hidden">
+        <!-- BAGIAN KIRI: STATIC & STICKY (Tidak ikut scroll) -->
+        <div class="hidden lg:flex w-1/2 bg-green-900 relative h-full items-center justify-center">
             <!-- Gambar Background -->
             <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
                  class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-multiply" 
@@ -40,9 +41,13 @@
             </div>
         </div>
 
-        <!-- BAGIAN KANAN: FORM LOGIN -->
-        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-gray-50 lg:bg-white">
-            <div class="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl lg:shadow-none border border-gray-100 lg:border-none">
+        <!-- BAGIAN KANAN: SCROLLABLE (Hanya bagian ini yang bisa di-scroll) -->
+        <div class="w-full lg:w-1/2 h-full overflow-y-auto bg-gray-50 lg:bg-white">
+            
+            {{-- Container Form (Min-h-full agar vertikal center jika konten sedikit, scroll jika banyak) --}}
+            <div class="min-h-full flex items-center justify-center p-8 sm:p-12">
+                
+                <div class="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl lg:shadow-none border border-gray-100 lg:border-none">
                 
                 <!-- Header Mobile -->
                 <div class="text-center lg:text-left">
@@ -146,7 +151,9 @@
                         </a>
                     </div>
                 </div>
+
             </div>
+        </div>
         </div>
     </div>
 
