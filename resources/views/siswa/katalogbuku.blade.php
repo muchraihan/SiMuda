@@ -27,7 +27,6 @@
         }
 
         function confirmPinjam(event, formId, judulBuku) {
-            // Mencegah klik tembus ke kartu (PENTING)
             event.stopPropagation(); 
             
             Swal.fire({
@@ -50,19 +49,40 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            {{-- Form Pencarian --}}
+            {{-- ========================================== --}}
+            {{-- FORM PENCARIAN & FILTER KATEGORI --}}
+            {{-- ========================================== --}}
             <div class="mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
                 <form action="{{ route('katalog.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-4">
-                    <div class="relative w-full sm:w-1/2">
+                    
+                    {{-- 1. Input Pencarian --}}
+                    <div class="relative w-full sm:w-5/12">
                         <input type="text" name="search" value="{{ request('search') }}"
-                               placeholder="Cari berdasarkan judul, penulis, atau tahun..."
+                               placeholder="Cari judul, penulis..."
                                class="w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg shadow-sm py-2 pl-4 pr-10">
                         @if(request('search'))
-                            <a href="{{ route('katalog.index') }}" 
+                            <a href="{{ route('katalog.index', ['kategori' => request('kategori')]) }}" 
                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-red-500 transition duration-200"
                                title="Hapus pencarian">&times;</a>
                         @endif
                     </div>
+
+                    {{-- 2. Filter Kategori (BARU) --}}
+                    <div class="relative w-full sm:w-4/12">
+                        <select name="kategori" class="w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-lg shadow-sm py-2 pl-3 pr-8 cursor-pointer">
+                            <option value="">Semua Kategori</option>
+                            @php
+                                $kategoriList = ['Buku Pelajaran', 'Novel', 'Komik', 'Ensiklopedia', 'Biografi', 'Agama', 'Majalah', 'Lainnya'];
+                            @endphp
+                            @foreach($kategoriList as $kat)
+                                <option value="{{ $kat }}" {{ request('kategori') == $kat ? 'selected' : '' }}>
+                                    {{ $kat }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- 3. Tombol Cari --}}
                     <button type="submit" class="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-150 font-semibold shadow-md flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -71,48 +91,44 @@
                     </button>
                 </form>
             </div>
+            {{-- ========================================== --}}
+
 
             {{-- Grid Kartu Buku --}}
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 @forelse ($books as $book)
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] border border-gray-100 relative group cursor-pointer">
-                        
-                        {{-- Link Utama (Stretched Link) --}}
                         <a href="{{ route('katalog.show', $book->id_buku) }}" class="absolute inset-0 z-0" title="Lihat detail {{ $book->judul }}"></a>
 
-                        {{-- Gambar Buku --}}
                         @if ($book->url_sampul)
-                            <img class="w-full h-48 sm:h-64 object-cover"
-                                 src="{{ asset('storage/' . $book->url_sampul) }}"
-                                 alt="Cover Buku: {{ $book->judul }}">
+                            <img class="w-full h-48 sm:h-64 object-cover" src="{{ asset('storage/' . $book->url_sampul) }}" alt="Cover Buku">
                         @else
-                            <img class="w-full h-48 sm:h-64 object-cover"
-                                 src="{{ asset('images/default-cover.jpg') }}"
-                                 alt="Default Cover">
+                            <img class="w-full h-48 sm:h-64 object-cover" src="{{ asset('images/default-cover.jpg') }}" alt="Default Cover">
                         @endif
 
-                        {{-- Detail Buku --}}
                         <div class="p-4 flex-1 flex flex-col">
+                            {{-- Badge Kategori --}}
+                            <div class="mb-2">
+                                <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-green-700 bg-green-100 rounded-md border border-green-200">
+                                    {{ $book->kategori ?? 'Umum' }}
+                                </span>
+                            </div>
+
                             <h3 class="text-md sm:text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2">
                                 {{ $book->judul }}
                             </h3>
-
                             <p class="text-xs text-gray-500 mb-2 italic">
                                 {{ $book->penulis ?? 'Penulis tidak diketahui' }}
                             </p>
-
                             <p class="text-sm text-gray-700 line-clamp-3 mb-3">
                                 {{ $book->deskripsi ?? 'Tidak ada deskripsi tersedia.' }}
                             </p>
 
                             <div class="mt-auto"> 
                                 <div class="d-flex justify-content-between align-items-center flex flex-col gap-2">
-                                    
                                     <span class="text-gray-600 text-xs font-bold self-start">
                                         Stok: {{ $book->jumlah_stok }}
                                     </span>
-
-                                    {{-- Container Tombol (Relative & Z-Index Tinggi) --}}
                                     <div class="relative z-10 w-full">
                                         @if($book->jumlah_stok > 0)
                                             <form action="{{ route('peminjaman.ajukan', $book->id_buku) }}" method="POST" id="form-pinjam-{{ $book->id_buku }}">
@@ -145,15 +161,9 @@
                 @endforelse
             </div>
 
-            {{-- 
-                MODIFIKASI PAGINASI RESPONSIF
-                - Stack vertikal di mobile (flex-col), horizontal di desktop (sm:flex-row)
-                - Scroll horizontal untuk tombol halaman jika layar sempit
-            --}}
+            {{-- Paginasi --}}
             @if ($books->total() > 0)
                 <div class="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-gray-200 pt-6">
-                    
-                    {{-- Informasi Jumlah Data --}}
                     <span class="text-sm text-gray-600 order-3 sm:order-1 text-center sm:text-left w-full sm:w-auto">
                         Menampilkan <span class="font-bold text-gray-800">{{ $books->firstItem() }}</span>
                         sampai <span class="font-bold text-gray-800">{{ $books->lastItem() }}</span>
@@ -161,10 +171,11 @@
                     </span>
 
                     <div class="flex flex-col sm:flex-row items-center gap-4 order-1 sm:order-2 w-full sm:w-auto">
-                        
-                        {{-- Pilihan Per Halaman --}}
                         <form action="{{ route('katalog.index') }}" method="GET" class="flex items-center justify-center space-x-2 w-full sm:w-auto">
                             <input type="hidden" name="search" value="{{ request('search') }}">
+                            {{-- [PENTING] Simpan filter kategori saat ganti halaman --}}
+                            <input type="hidden" name="kategori" value="{{ request('kategori') }}">
+                            
                             <label for="per_page" class="text-sm text-gray-600 whitespace-nowrap">Tampilkan:</label>
                             <select name="per_page" id="per_page" onchange="this.form.submit()" 
                                     class="border-gray-300 rounded-lg text-sm py-1.5 pl-3 pr-8 focus:border-green-500 focus:ring-green-500 shadow-sm cursor-pointer hover:border-green-400 transition">
@@ -175,51 +186,32 @@
                             </select>
                         </form>
 
-                        {{-- Tombol Navigasi Halaman --}}
                         @if ($books->hasPages())
-                        <div class="flex justify-center w-full sm:w-auto">
-                            <div class="flex items-center space-x-1 bg-white p-1 rounded-lg shadow-sm border border-gray-200 overflow-x-auto max-w-[90vw] sm:max-w-none no-scrollbar">
-                                {{-- Tombol Previous --}}
-                                @if ($books->onFirstPage())
-                                    <span class="px-3 py-1.5 text-gray-300 cursor-not-allowed border border-transparent rounded-md">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                                    </span>
+                        <div class="flex items-center space-x-1 bg-gray-100 px-2 py-1 rounded-lg shadow-inner overflow-x-auto max-w-[90vw] sm:max-w-none no-scrollbar">
+                            @if ($books->onFirstPage())
+                                <span class="px-2 sm:px-3 py-1 text-gray-400 cursor-not-allowed border border-transparent rounded-md">&laquo;</span>
+                            @else
+                                <a href="{{ $books->previousPageUrl() }}" class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition border border-transparent">&laquo;</a>
+                            @endif
+
+                            @php
+                                $start = max(1, $books->currentPage() - 1);
+                                $end = min($books->lastPage(), $books->currentPage() + 1);
+                            @endphp
+                            
+                            @foreach ($books->getUrlRange($start, $end) as $page => $url)
+                                @if ($page == $books->currentPage())
+                                    <span class="px-2 sm:px-3 py-1 bg-green-600 text-white font-semibold rounded-md shadow-md">{{ $page }}</span>
                                 @else
-                                    <a href="{{ $books->previousPageUrl() }}"
-                                       class="px-3 py-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-md transition border border-transparent" title="Sebelumnya">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                                    </a>
+                                    <a href="{{ $url }}" class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition">{{ $page }}</a>
                                 @endif
+                            @endforeach
 
-                                {{-- Nomor Halaman (Smart Range) --}}
-                                @php
-                                    $start = max(1, $books->currentPage() - 1); // Kurangi range di mobile biar tidak terlalu lebar
-                                    $end = min($books->lastPage(), $books->currentPage() + 1);
-                                    if($start > 1) echo '<span class="px-1 text-gray-400">...</span>';
-                                @endphp
-                                
-                                @foreach ($books->getUrlRange($start, $end) as $page => $url)
-                                    @if ($page == $books->currentPage())
-                                        <span class="px-3 py-1.5 bg-green-600 text-white text-sm font-bold rounded-md shadow-md">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}" class="px-3 py-1.5 text-gray-600 hover:text-green-600 hover:bg-green-50 text-sm font-medium rounded-md transition">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-
-                                @php if($end < $books->lastPage()) echo '<span class="px-1 text-gray-400">...</span>'; @endphp
-
-                                {{-- Tombol Next --}}
-                                @if ($books->hasMorePages())
-                                    <a href="{{ $books->nextPageUrl() }}"
-                                       class="px-3 py-1.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-md transition border border-transparent" title="Berikutnya">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                    </a>
-                                @else
-                                    <span class="px-3 py-1.5 text-gray-300 cursor-not-allowed border border-transparent rounded-md">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                    </span>
-                                @endif
-                            </div>
+                            @if ($books->hasMorePages())
+                                <a href="{{ $books->nextPageUrl() }}" class="px-2 sm:px-3 py-1 text-gray-700 hover:bg-green-500 hover:text-white rounded-md transition border border-transparent">&raquo;</a>
+                            @else
+                                <span class="px-2 sm:px-3 py-1 text-gray-400 cursor-not-allowed border border-transparent rounded-md">&raquo;</span>
+                            @endif
                         </div>
                         @endif
                     </div>

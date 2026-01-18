@@ -9,29 +9,33 @@ class KatalogBukuController extends Controller
 {
     public function index(Request $request)
     {
-        // Fitur pencarian (opsional)
         $search = $request->input('search');
-
-        // Paginasi dengan opsi per_page
+        $kategori = $request->input('kategori'); // [1] Ambil input kategori
         $perPage = $request->input('per_page', 10);
 
         $books = Buku::query()
+            // Logika Pencarian Teks
             ->when($search, function ($query, $search) {
-                $query->where('judul', 'like', "%{$search}%")
+                $query->where(function($q) use ($search) {
+                    $q->where('judul', 'like', "%{$search}%")
                       ->orWhere('penulis', 'like', "%{$search}%")
                       ->orWhere('tahun_terbit', 'like', "%{$search}%");
+                });
             })
-            ->paginate($perPage);
+            // [2] Logika Filter Kategori (BARU)
+            ->when($kategori, function ($query, $kategori) {
+                $query->where('kategori', $kategori);
+            })
+            ->paginate($perPage)
+            // [3] Pastikan parameter tetap ada saat ganti halaman
+            ->appends(['search' => $search, 'kategori' => $kategori, 'per_page' => $perPage]);
 
         return view('siswa.katalogbuku', compact('books'));
     }
 
     public function show($id)
     {
-        // Mengambil data buku berdasarkan ID, jika tidak ada akan error 404
-        $book = \App\Models\Buku::findOrFail($id);
-
-        // Mengirim data buku ke view detail
+        $book = Buku::findOrFail($id);
         return view('siswa.show', compact('book'));
     }
 }

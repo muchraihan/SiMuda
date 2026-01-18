@@ -60,6 +60,20 @@
                         class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
+                {{-- [TAMBAHAN BARU] Kategori Buku --}}
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Kategori Buku</label>
+                    <select name="kategori" required 
+                            class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">-- Pilih Kategori --</option>
+                        @foreach(['Buku Pelajaran', 'Novel', 'Komik', 'Ensiklopedia', 'Biografi', 'Agama', 'Majalah', 'Lainnya'] as $kat)
+                            <option value="{{ $kat }}" {{ old('kategori', $buku->kategori) == $kat ? 'selected' : '' }}>
+                                {{ $kat }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- Penulis --}}
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Penulis</label>
@@ -112,14 +126,39 @@
                 {{-- Upload Sampul --}}
                 <div>
                     <label class="block text-gray-700 font-semibold mb-1">Upload Sampul Buku</label>
-                    @if($buku->url_sampul)
-                        <div class="mb-2">
-                            <img src="{{ asset('storage/' . $buku->url_sampul) }}" alt="Sampul Buku" class="h-32 rounded-md shadow-sm">
-                        </div>
-                    @endif
-                    <input type="file" name="url_sampul"
-                        class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    
+                    {{-- Preview Gambar --}}
+                    <div class="mb-3">
+                        <img id="img-preview" 
+                             src="{{ $buku->url_sampul ? asset('storage/' . $buku->url_sampul) : '' }}" 
+                             alt="Preview Sampul" 
+                             class="{{ $buku->url_sampul ? '' : 'hidden' }} h-32 rounded-md shadow-sm object-cover border border-gray-200">
+                    </div>
+
+                    <input type="file" 
+                           name="url_sampul" 
+                           id="url_sampul"
+                           onchange="previewImage()"
+                           class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
+
+                {{-- Script Preview Image --}}
+                <script>
+                    function previewImage() {
+                        const image = document.querySelector('#url_sampul');
+                        const imgPreview = document.querySelector('#img-preview');
+
+                        if (image.files && image.files[0]) {
+                            const oFReader = new FileReader();
+                            oFReader.readAsDataURL(image.files[0]);
+
+                            oFReader.onload = function(oFREvent) {
+                                imgPreview.src = oFREvent.target.result;
+                                imgPreview.classList.remove('hidden');
+                            }
+                        }
+                    }
+                </script>
 
                 {{-- Tombol Aksi --}}
                 <div class="flex justify-end space-x-3 pt-4 border-t mt-6">

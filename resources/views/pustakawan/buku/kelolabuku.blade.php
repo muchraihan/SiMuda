@@ -110,7 +110,7 @@
                             <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Judul Buku</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Penulis</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Penerbit</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Tahun</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold uppercase">kategori</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Stok</th>
                             <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Aksi</th>
                         </tr>
@@ -122,7 +122,7 @@
                                 <td class="py-3 px-4">{{ $item->judul }}</td>
                                 <td class="py-3 px-4">{{ $item->penulis }}</td>
                                 <td class="py-3 px-4">{{ $item->penerbit }}</td>
-                                <td class="py-3 px-4">{{ $item->tahun_terbit }}</td>
+                                <td class="py-3 px-4">{{ $item->kategori }}</td>
                                 <td class="py-3 px-4">{{ $item->jumlah_stok }}</td>
                                 <td class="py-3 px-4">
                                     <div class="flex justify-center space-x-2">

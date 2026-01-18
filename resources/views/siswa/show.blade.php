@@ -123,6 +123,12 @@
                                         {{ $book->rak ?? '?' }}
                                     </span>
                                 </div>
+                                <div>
+                                    <span class="block text-xs text-gray-500 uppercase tracking-wide">kategori</span>
+                                    <span class="font-bold text-gray-800 bg-blue-50 px-2 py-0.5 rounded">
+                                        {{ $book->kategori ?? '?' }}
+                                    </span>
+                                </div>
                             </div>
 
                             {{-- Deskripsi (DENGAN SCROLL) --}}

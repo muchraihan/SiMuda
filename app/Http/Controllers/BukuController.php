@@ -22,7 +22,8 @@ class BukuController extends Controller
         $buku = Buku::when($search, function ($query, $search) {
             $query->where('judul', 'like', "%{$search}%")
                 ->orWhere('penulis', 'like', "%{$search}%")
-                ->orWhere('penerbit', 'like', "%{$search}%");
+                ->orWhere('penerbit', 'like', "%{$search}%")
+                ->orWhere('kategori', 'like', "%{$search}%"); // [TAMBAHAN] Cari by kategori
         })->paginate($perPage)->appends(['per_page' => $perPage, 'search' => $search]);
 
         return view('pustakawan.buku.kelolabuku', compact('buku', 'search', 'perPage'));
@@ -43,6 +44,7 @@ class BukuController extends Controller
     {
         $request->validate([
             'judul' => 'required|string|max:255',
+            'kategori' => 'required|string|max:50', // [TAMBAHAN] Validasi Kategori
             'penulis' => 'nullable|string|max:255',
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|digits:4|integer|min:1900|max:' . date('Y'),
@@ -60,6 +62,7 @@ class BukuController extends Controller
 
         Buku::create([
             'judul' => $request->judul,
+            'kategori' => $request->kategori, // [TAMBAHAN] Simpan Kategori
             'penulis' => $request->penulis,
             'penerbit' => $request->penerbit,
             'tahun_terbit' => $request->tahun_terbit,
@@ -91,6 +94,7 @@ class BukuController extends Controller
 
         $request->validate([
             'judul' => 'required|string|max:255',
+            'kategori' => 'required|string|max:50', // [TAMBAHAN] Validasi Kategori
             'penulis' => 'nullable|string|max:255',
             'penerbit' => 'nullable|string|max:255',
             'tahun_terbit' => 'nullable|digits:4|integer|min:1900|max:' . date('Y'),
@@ -111,6 +115,7 @@ class BukuController extends Controller
 
         $buku->update($request->only([
             'judul',
+            'kategori', // [TAMBAHAN] Update Kategori
             'penulis',
             'penerbit',
             'tahun_terbit',
@@ -128,30 +133,34 @@ class BukuController extends Controller
      */
     public function destroy($id_buku)
     {
-        $buku = Buku::findOrFail($id_buku);
+        try {
+            $buku = Buku::findOrFail($id_buku);
 
-        // 1. Cek apakah buku sedang beredar (Dipinjam/Terlambat/Diajukan)
-        // Kalau statusnya 'kembali' atau 'ditolak', boleh dihapus.
-        $sedangDipinjam = Peminjaman::where('id_buku', $id_buku)
-            ->whereIn('status', ['diajukan', 'dipinjam', 'terlambat'])
-            ->exists();
+            // Cek apakah buku sedang dipinjam (belum dikembalikan)
+            // Logika baru: Cek status 'diajukan', 'dipinjam', 'terlambat'
+            $sedangDipinjam = Peminjaman::where('id_buku', $id_buku)
+                ->whereIn('status', ['diajukan', 'dipinjam', 'terlambat'])
+                ->exists();
 
-        if ($sedangDipinjam) {
-            return redirect()->back()
-                ->with('error', 'Gagal hapus! Buku sedang dipinjam atau diajukan oleh siswa. Harap selesaikan transaksinya dulu.');
+            if ($sedangDipinjam) {
+                return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))
+                    ->with('error', 'Gagal hapus! Buku ini sedang dalam proses peminjaman (Diajukan/Dipinjam/Terlambat).');
+            }
+
+            // Hapus gambar jika ada (Opsional: Jika pakai Soft Deletes, sebaiknya jangan hapus gambar dulu)
+            // if ($buku->url_sampul) {
+            //     Storage::disk('public')->delete($buku->url_sampul);
+            // }
+
+            // Hapus (Soft Delete)
+            $buku->delete();
+            
+            return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))
+                ->with('success', 'Buku berhasil dihapus (Arsip)!');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('pustakawan.buku.index', request()->only(['search', 'per_page']))
+                ->with('error', 'Terjadi kesalahan saat menghapus buku: ' . $e->getMessage());
         }
-
-        // 2. Hapus Buku (Soft Delete)
-        // Data tidak hilang dari database, tapi hilang dari aplikasi
-        $buku->delete();
-
-        // Opsional: Jika ingin menghapus gambar sampulnya juga untuk menghemat ruang
-        // (Tapi saran saya biarkan saja jika ingin riwayat sampul tetap ada)
-        /* if ($buku->url_sampul && file_exists(public_path('images/buku/' . $buku->url_sampul))) {
-            unlink(public_path('images/buku/' . $buku->url_sampul));
-        }
-        */
-
-        return redirect()->back()->with('success', 'Buku berhasil dihapus (Diarsip). Riwayat peminjaman tetap aman.');
     }
 }
