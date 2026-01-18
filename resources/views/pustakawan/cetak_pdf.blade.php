@@ -3,7 +3,7 @@
 <head>
     <title>Laporan Peminjaman</title>
     <style>
-        body { font-family: sans-serif; font-size: 11px; } /* Font diperkecil sedikit agar muat */
+        body { font-family: sans-serif; font-size: 11px; }
         h2, h3 { text-align: center; margin: 0; }
         .header { margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -37,7 +37,7 @@
                 <th style="width: 10%">Tgl Pinjam</th>
                 <th style="width: 10%">Tgl Kembali</th>
                 <th style="width: 8%">Status</th>
-                <th style="width: 10%">Denda</th> {{-- KOLOM BARU --}}
+                <th style="width: 10%">Denda</th>
             </tr>
         </thead>
         <tbody>
@@ -55,11 +55,15 @@
                 </td>
                 <td class="text-center">{{ ucfirst($item->status) }}</td>
                 
-                {{-- KOLOM DENDA --}}
+                {{-- KOLOM DENDA (MODIFIKASI ABS) --}}
                 <td class="text-right">
                     @if($item->denda)
-                        @php $totalDenda += $item->denda->jumlah_denda; @endphp
-                        <span class="text-red">Rp {{ number_format($item->denda->jumlah_denda, 0, '', '.') }}</span>
+                        @php 
+                            // Pastikan nilai denda selalu positif menggunakan abs()
+                            $jumlahDenda = abs($item->denda->jumlah_denda);
+                            $totalDenda += $jumlahDenda; 
+                        @endphp
+                        <span class="text-red">Rp {{ number_format($jumlahDenda, 0, ',', '.') }}</span>
                         <br>
                         <small style="font-size: 8px; color: #555;">
                             ({{ $item->denda->status_pembayaran == 'lunas' ? 'Lunas' : 'Belum' }})
@@ -71,10 +75,12 @@
             </tr>
             @endforeach
             
-            {{-- BARIS TOTAL --}}
+            {{-- BARIS TOTAL (MODIFIKASI ABS) --}}
             <tr>
                 <td colspan="8" class="text-right" style="font-weight: bold; background-color: #f9f9f9;">Total Pemasukan Denda Bulan Ini:</td>
-                <td class="text-right" style="font-weight: bold; background-color: #f9f9f9;">Rp {{ number_format($totalDenda, 0, '', '.') }}</td>
+                <td class="text-right" style="font-weight: bold; background-color: #f9f9f9;">
+                    Rp {{ number_format(abs($totalDenda), 0, ',', '.') }}
+                </td>
             </tr>
         </tbody>
     </table>

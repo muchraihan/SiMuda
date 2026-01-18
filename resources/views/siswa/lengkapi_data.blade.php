@@ -33,36 +33,38 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Nomor Induk Siswa (NIS)</label>
                         <input type="text" name="nis" value="{{ old('nis') }}" required
-                            class="shadow-sm border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md w-full"
-                            placeholder="Contoh: 12345678">
+                            class="shadow-sm border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md w-full">
                     </div>
 
                     {{-- Kelas (Gunakan SELECT agar seragam) --}}
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Kelas Saat Ini</label>
-                        {{-- Opsi input manual jika ingin input text biasa: --}}
-                        {{-- <input type="text" name="kelas" value="{{ old('kelas') }}" required ... > --}}
-                        
-                        {{-- Saran saya: Gunakan Select agar rapi --}}
                         <select name="kelas" required
                             class="w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm">
                             <option value="">-- Pilih Kelas --</option>
-                            <option value="VII" {{ old('kelas') == 'VII' ? 'selected' : '' }}>VII</option>
-                            <option value="VIII" {{ old('kelas') == 'VIII' ? 'selected' : '' }}>VIII</option>
-                            <option value="IX" {{ old('kelas') == 'IX' ? 'selected' : '' }}>IX</option>
+                            <option value="VII" {{ old('kelas') == 'VII' ? 'selected' : '' }}>Kelas VII</option>
+                            <option value="VIII" {{ old('kelas') == 'VIII' ? 'selected' : '' }}>Kelas VIII</option>
+                            <option value="IX" {{ old('kelas') == 'IX' ? 'selected' : '' }}>Kelas IX</option>
                         </select>
                     </div>
 
-                    {{-- No WA --}}
+                    {{-- No WA (MODIFIKASI: Hanya Angka) --}}
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Nomor WhatsApp</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 text-sm font-bold">+62</span>
                             </div>
-                            <input type="number" name="nomor_whatsapp" value="{{ old('nomor_whatsapp') }}" required
-                                class="pl-12 shadow-sm border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md w-full"
-                                placeholder="8123456789">
+                            <input type="text" 
+                                   name="nomor_whatsapp" 
+                                   value="{{ old('nomor_whatsapp') }}" 
+                                   required
+                                   inputmode="numeric" 
+                                   pattern="[0-9]*"
+                                   maxlength="14"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                   class="pl-12 shadow-sm border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md w-full"
+                                   placeholder="8123456789">
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Masukkan angka saja, contoh: 81234567890 (Tanpa angka 0 di depan)</p>
                     </div>
