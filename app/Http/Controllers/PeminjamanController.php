@@ -75,17 +75,13 @@ class PeminjamanController extends Controller
     public function indexPustakawan(Request $request)
     {
         $search = $request->input('search');
-        // Ambil input per_page, default 10 jika tidak ada
         $perPage = $request->input('per_page', 10); 
 
-        // 1. TABEL ATAS (Approval) - Tetap ambil semua (tanpa paginasi)
-        // Karena biasanya jumlah yang minta acc tidak sampai ratusan sekaligus.
         $permintaan = Peminjaman::with(['siswa.user', 'buku'])
                         ->where('status', 'diajukan')
                         ->orderBy('tgl_pengajuan', 'asc')
                         ->get();
 
-        // 2. TABEL BAWAH (Monitoring) - GUNAKAN PAGINASI
         $sedangDipinjam = Peminjaman::with(['siswa.user', 'buku'])
                         ->whereIn('status', ['dipinjam', 'terlambat'])
                         ->when($search, function ($query, $search) {
@@ -99,9 +95,7 @@ class PeminjamanController extends Controller
                             });
                         })
                         ->orderBy('tgl_pinjam', 'desc')
-                        // Ganti get() menjadi paginate()
                         ->paginate($perPage) 
-                        // Tambahkan appends agar search & filter tidak hilang saat ganti halaman
                         ->appends(['search' => $search, 'per_page' => $perPage]);
 
         return view('pustakawan.peminjaman', compact('permintaan', 'sedangDipinjam'));
@@ -110,11 +104,8 @@ class PeminjamanController extends Controller
     // --- [FITUR 1: KIRIM WA SAAT DISETUJUI] ---
     public function setujui($id_peminjaman)
     {
-        // Gunakan lockForUpdate jika trafik tinggi, tapi findOrFail cukup untuk skala sekolah
         $peminjaman = Peminjaman::with(['siswa.user', 'buku'])->findOrFail($id_peminjaman);
 
-        // [PENTING!] CEK STATUS DULU
-        // Jika status bukan 'diajukan' (misal sudah diproses request sebelumnya), tolak request ini.
         if ($peminjaman->status !== 'diajukan') {
             return back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
         }
@@ -123,7 +114,6 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Gagal menyetujui. Stok buku fisik habis.');
         }
 
-        // Tentukan Tanggal Kembali (7 Hari dari sekarang)
         $tglKembali = Carbon::now()->addDays(7);
 
         $peminjaman->update([
@@ -154,7 +144,6 @@ class PeminjamanController extends Controller
                    . "Silakan ambil buku di perpustakaan. Harap kembalikan tepat waktu.\n"
                    . "_Salam, SiMuda_";
 
-            // Tambahkan sleep agar loading terasa (visual cue untuk user bahwa sedang proses)
             sleep(rand(2, 4));
 
             Http::withoutVerifying()->withHeaders([
@@ -176,7 +165,6 @@ class PeminjamanController extends Controller
     {
         $peminjaman = Peminjaman::findOrFail($id_peminjaman);
 
-        // [PENTING!] CEK STATUS DULU
         if ($peminjaman->status !== 'diajukan') {
             return back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
         }
@@ -189,17 +177,14 @@ class PeminjamanController extends Controller
     {
         $peminjaman = Peminjaman::findOrFail($id_peminjaman);
 
-        // Cek status agar tidak dikembalikan 2x (mengacaukan stok)
         if (!in_array($peminjaman->status, ['dipinjam', 'terlambat'])) {
             return back()->with('error', 'Data tidak valid atau sudah dikembalikan.');
         }
 
-        // --- LOGIKA HITUNG DENDA ---
         $tglWajib = Carbon::parse($peminjaman->tgl_kembali_maksimal);
         $tglKembali = now();
         $pesanTambahan = "";
 
-        // Cek apakah pengembalian melebihi tanggal wajib?
         if ($tglKembali->gt($tglWajib)) {
             $jumlahHari = $tglKembali->diffInDays($tglWajib);
             $totalDenda = $jumlahHari * 1000; 

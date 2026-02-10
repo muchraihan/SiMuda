@@ -1,6 +1,4 @@
 @php
-    // Helper untuk menampilkan status dengan warna Tailwind CSS
-    // Kita taruh disini biar tidak mengotori file Controller dengan HTML
     function getStatusBadge($status) {
         switch ($status) {
             case 'dipinjam':
@@ -99,11 +97,9 @@
                                     </td>
                                 </tr>
                                 @endforelse
-
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>

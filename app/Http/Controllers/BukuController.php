@@ -115,7 +115,7 @@ class BukuController extends Controller
 
         $buku->update($request->only([
             'judul',
-            'kategori', // [TAMBAHAN] Update Kategori
+            'kategori',
             'penulis',
             'penerbit',
             'tahun_terbit',
@@ -136,8 +136,6 @@ class BukuController extends Controller
         try {
             $buku = Buku::findOrFail($id_buku);
 
-            // Cek apakah buku sedang dipinjam (belum dikembalikan)
-            // Logika baru: Cek status 'diajukan', 'dipinjam', 'terlambat'
             $sedangDipinjam = Peminjaman::where('id_buku', $id_buku)
                 ->whereIn('status', ['diajukan', 'dipinjam', 'terlambat'])
                 ->exists();

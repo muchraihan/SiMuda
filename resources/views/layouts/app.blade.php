@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Script SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -92,22 +91,17 @@
             }
 
             // === Desktop Logic ===
-            // Tombol TUTUP ada di dalam Sidebar (_sidebar.blade.php)
             const btnClose = document.getElementById('btn-close-sidebar'); 
-            // Tombol BUKA ada di Header (_header.blade.php)
             const btnOpen = document.getElementById('btn-open-sidebar');   
 
             if (btnClose) {
                 btnClose.addEventListener('click', () => {
-                    // TUTUP SIDEBAR DESKTOP
                     sidebar.classList.add('lg:w-0', 'lg:p-0', 'overflow-hidden');
                     sidebar.classList.remove('lg:w-72');
                     
-                    // Geser konten ke kiri (full width)
                     mainContent.classList.remove('lg:ml-72');
                     mainContent.classList.add('lg:ml-0');
 
-                    // Munculkan tombol BUKA di header
                     if(btnOpen) {
                         btnOpen.classList.remove('hidden');
                         btnOpen.classList.add('lg:block');
@@ -117,15 +111,12 @@
 
             if (btnOpen) {
                 btnOpen.addEventListener('click', () => {
-                    // BUKA SIDEBAR DESKTOP
                     sidebar.classList.remove('lg:w-0', 'lg:p-0', 'overflow-hidden');
                     sidebar.classList.add('lg:w-72');
                     
-                    // Geser konten ke kanan
                     mainContent.classList.remove('lg:ml-0');
                     mainContent.classList.add('lg:ml-72');
 
-                    // Sembunyikan tombol BUKA ini sendiri
                     btnOpen.classList.add('hidden');
                     btnOpen.classList.remove('lg:block');
                 });

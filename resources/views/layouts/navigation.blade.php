@@ -2,11 +2,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             
-            {{-- BAGIAN KIRI: TOGGLE SIDEBAR & LOGO --}}
             <div class="flex items-center">
                 
                 {{-- 1. TOMBOL HAMBURGER (KHUSUS MOBILE) --}}
-                {{-- Tombol ini akan mentrigger ID sidebar untuk muncul/hilang --}}
                 <button id="sidebar-toggle" 
                         class="lg:hidden mr-3 p-2 rounded-md text-gray-500 hover:text-green-600 hover:bg-green-50 focus:outline-none transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -21,7 +19,6 @@
                              alt="Logo" 
                              class="block h-9 w-auto mr-2">
                         
-                        {{-- Teks hanya muncul di layar besar (md ke atas) agar HP tidak sempit --}}
                         <div class="hidden md:flex flex-col">
                             <span class="text-gray-800 text-lg font-bold leading-tight">SiMuda</span>
                             <span class="text-xs text-gray-500 font-medium">Perpustakaan SMP Muhammadiyah 2</span>
@@ -38,11 +35,9 @@
                             
                             {{-- Info User (Nama & Role) --}}
                             <div class="text-right mr-2">
-                                {{-- Nama dipotong jika terlalu panjang di HP --}}
                                 <div class="text-sm font-bold text-gray-800 max-w-[100px] sm:max-w-none truncate">
                                     {{ Auth::user()->name }}
                                 </div>
-                                {{-- Role disembunyikan di HP yg sangat kecil, muncul di SM ke atas --}}
                                 <div class="text-xs text-green-600 font-semibold hidden sm:block">
                                     {{ ucfirst(Auth::user()->peran) }}
                                 </div>
@@ -100,23 +95,20 @@
     </div>
 </nav>
 
-{{-- SCRIPT PENGENDALI SIDEBAR --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('sidebar-toggle');
-        const contentOverlay = document.createElement('div'); // Overlay hitam transparan (opsional)
+        const contentOverlay = document.createElement('div'); 
 
         // Fungsi Toggle
         if(toggleBtn && sidebar) {
             toggleBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Mencegah klik tembus
-                // Toggle class translate untuk memunculkan/menyembunyikan sidebar
+                e.stopPropagation();
                 sidebar.classList.toggle('-translate-x-full');
             });
         }
 
-        // Fitur Tambahan: Klik di luar sidebar untuk menutup (Mobile UX)
         document.addEventListener('click', (e) => {
             if (window.innerWidth < 1024) { // Hanya di mode mobile
                 if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !sidebar.classList.contains('-translate-x-full')) {

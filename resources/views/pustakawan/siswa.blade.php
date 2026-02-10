@@ -1,25 +1,18 @@
 <x-app-layout>
-    {{-- Slot untuk judul halaman yang akan muncul di header --}}
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Manajemen Data Siswa') }}
         </h2>
     </x-slot>
 
-    {{-- ============================================================== --}}
-    {{-- NOTIFIKASI SWEETALERT --}}
-    {{-- ============================================================== --}}
-    
-    <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
+
     <div id="flash-data" 
          data-success="{{ session('success') }}" 
          data-error="{{ session('error') }}">
     </div>
 
-    <!-- 2. Library SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 3. Script JS Murni -->
     <script>
         const flashData = document.getElementById('flash-data');
         const successMsg = flashData.dataset.success;
@@ -65,7 +58,6 @@
             });
         }
     </script>
-    {{-- ============================================================== --}}
 
     {{-- Konten Utama Halaman --}}
     <div class="py-12">
@@ -75,17 +67,9 @@
                     
                     <h3 class="text-2xl font-bold text-gray-800 mb-4">Daftar Data Siswa</h3>
 
-                    {{-- Bagian atas: Tombol Tambah dan Form Pencarian --}}
+                    {{-- Tombol Tambah dan Form Pencarian --}}
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-                        {{-- Tombol Tambah Siswa (Opsional jika mau tambah manual) --}}
-                        {{-- <a href="#" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Tambah Siswa</span>
-                        </a> --}}
                         
-                        {{-- Placeholder Kosong agar Search ada di Kanan --}}
                         <div></div> 
                         
                         {{-- Form Pencarian --}}
@@ -114,7 +98,6 @@
                             <tbody class="text-gray-700">
                                 @forelse($siswa as $index => $item)
                                 <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                    {{-- Nomor Urut (Memperhitungkan Pagination) --}}
                                     <td class="py-3 px-4">
                                         {{ $index + $siswa->firstItem() }}
                                     </td>
@@ -218,7 +201,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

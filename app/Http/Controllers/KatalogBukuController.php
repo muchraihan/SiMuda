@@ -14,7 +14,6 @@ class KatalogBukuController extends Controller
         $perPage = $request->input('per_page', 10);
 
         $books = Buku::query()
-            // Logika Pencarian Teks
             ->when($search, function ($query, $search) {
                 $query->where(function($q) use ($search) {
                     $q->where('judul', 'like', "%{$search}%")
@@ -22,12 +21,10 @@ class KatalogBukuController extends Controller
                       ->orWhere('tahun_terbit', 'like', "%{$search}%");
                 });
             })
-            // [2] Logika Filter Kategori (BARU)
             ->when($kategori, function ($query, $kategori) {
                 $query->where('kategori', $kategori);
             })
             ->paginate($perPage)
-            // [3] Pastikan parameter tetap ada saat ganti halaman
             ->appends(['search' => $search, 'kategori' => $kategori, 'per_page' => $perPage]);
 
         return view('siswa.katalogbuku', compact('books'));

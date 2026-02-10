@@ -55,7 +55,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 text-sm font-bold">+62</span>
                             </div>
-                            <input type="text" 
+                            <input type="number" 
                                    name="nomor_whatsapp" 
                                    value="{{ old('nomor_whatsapp') }}" 
                                    required
@@ -84,7 +84,6 @@
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>

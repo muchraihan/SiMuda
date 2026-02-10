@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
 
-    {{-- NOTIFIKASI SWEETALERT --}}
     <div id="flash-data" data-success="{{ session('success') }}" data-error="{{ session('error') }}"></div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -35,7 +34,6 @@
             });
         }
 
-        // Function untuk konfirmasi pembayaran denda
         function confirmBayar(id, jumlah, namaSiswa, judulBuku) {
             Swal.fire({
                 title: 'Konfirmasi Pembayaran',

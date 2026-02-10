@@ -15,7 +15,6 @@ class DendaController extends Controller
         $perPage = $request->input('per_page', 10);
         $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
 
-        // Ambil data denda beserta relasi ke peminjaman -> siswa -> user & buku
         $dataDenda = Denda::with(['peminjaman.siswa.user', 'peminjaman.buku'])
             ->when($search, function ($query, $search) {
                 return $query->whereHas('peminjaman.siswa.user', function ($q) use ($search) {
@@ -30,7 +29,6 @@ class DendaController extends Controller
         return view('pustakawan.denda', compact('dataDenda', 'search', 'perPage'));
     }
 
-    // Method untuk mengubah status jadi Lunas
     public function lunas($id_denda)
     {
         $denda = Denda::findOrFail($id_denda);

@@ -59,7 +59,6 @@
                 <td class="text-right">
                     @if($item->denda)
                         @php 
-                            // Pastikan nilai denda selalu positif menggunakan abs()
                             $jumlahDenda = abs($item->denda->jumlah_denda);
                             $totalDenda += $jumlahDenda; 
                         @endphp

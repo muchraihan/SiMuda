@@ -51,16 +51,13 @@ class ProfileController extends Controller
 
         // [LOGIKA BARU: CEK PEMINJAMAN SEBELUM HAPUS]
         if ($user->siswa) {
-            // Cek apakah ada data di tabel peminjaman milik siswa ini
             $adaPeminjaman = Peminjaman::where('id_siswa', $user->siswa->id_siswa)->exists();
 
             if ($adaPeminjaman) {
-                // Jika ada, batalkan hapus dan kirim pesan error agar ditangkap SweetAlert
                 return Redirect::to('/profile')->with('error', 'Gagal menghapus akun! Anda masih memiliki riwayat peminjaman buku. selesaikan peminjaman buku!');
             }
         }
 
-        // Jika aman (tidak ada peminjaman), baru proses hapus
         Auth::logout();
 
         $user->delete();

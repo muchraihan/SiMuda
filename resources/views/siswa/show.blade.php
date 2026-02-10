@@ -5,9 +5,6 @@
         </h2>
     </x-slot>
 
-    <!-- ========================================== -->
-    <!-- 1. SCRIPT SWEETALERT (Notifikasi & Konfirmasi) -->
-    <!-- ========================================== -->
     <div id="flash-data" 
          data-success="{{ session('success') }}" 
          data-error="{{ session('error') }}">
@@ -104,7 +101,6 @@
                                 </p>
                             </div>
 
-                            {{-- Grid Informasi Singkat (Rapi & Tidak Tumpang Tindih) --}}
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                                 <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                     <span class="block text-[10px] text-gray-500 uppercase tracking-wide font-bold mb-1">Penerbit</span>
@@ -141,7 +137,7 @@
                                 </div>
                             </div>
 
-                            {{-- Tombol Aksi (Fixed di Bawah pada Mobile, Normal di Desktop) --}}
+                            {{-- Tombol Aksi  --}}
                             <div class="mt-auto pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
 
                                 @if($book->jumlah_stok > 0)
@@ -174,7 +170,6 @@
         </div>
     </div>
 
-    {{-- Style Tambahan untuk Scrollbar Cantik --}}
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }

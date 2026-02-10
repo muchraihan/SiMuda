@@ -10,10 +10,6 @@ use Carbon\Carbon;
 
 class SendOverdueNotification extends Command
 {
-    /**
-     * Nama perintah yang akan diketik di terminal
-     * Pastikan ini sama dengan yang ada di routes/console.php
-     */
     protected $signature = 'notifikasi:kirim';
 
     protected $description = 'Kirim notifikasi WA harian ke siswa yang terlambat';
@@ -49,7 +45,7 @@ class SendOverdueNotification extends Command
             try {
                 // A. Format Nomor WA (Pastikan 62)
                 $target = $item->siswa->nomor_whatsapp;
-                $target = preg_replace('/[^0-9]/', '', $target); // Hapus karakter non-angka
+                $target = preg_replace('/[^0-9]/', '', $target);
                 if (substr($target, 0, 1) === '0') {
                     $target = '62' . substr($target, 1);
                 }
@@ -59,22 +55,16 @@ class SendOverdueNotification extends Command
                 $buku = $item->buku->judul;
                 $tgl  = Carbon::parse($item->tgl_kembali_maksimal)->translatedFormat('d F Y');
                 
-                // --- PERBAIKAN DI SINI ---
-                // Gunakan abs() untuk memastikan nilai positif (menghilangkan minus)
-                // floor() untuk membulatkan ke bawah atau ceil() ke atas, tapi diffInDays biasanya sudah int/float bersih
-                // Urutan parameter: tgl_kembali_maksimal dibandingkan dengan SEKARANG
-                
                 $tglKembali = Carbon::parse($item->tgl_kembali_maksimal);
                 $sekarang = Carbon::now();
 
                 // Hitung selisih hari secara absolut (positif)
-                $telat = abs($tglKembali->diffInDays($sekarang, false)); // false agar bisa negatif, lalu di-abs-kan
+                $telat = abs($tglKembali->diffInDays($sekarang, false));
                 
-                // Pastikan minimal 1 hari (jika selisih jam masih dianggap 0)
-                $telat = $telat < 1 ? 1 : round($telat); // round() menghilangkan desimal
+                $telat = $telat < 1 ? 1 : round($telat);
                 
                 $denda = $telat * 1000; 
-                $dendaFormatted = number_format($denda, 0, ',', '.'); // Format Rupiah tanpa desimal
+                $dendaFormatted = number_format($denda, 0, ',', '.');
 
                 $pesan = "*PENGINGAT HARIAN* 🔔\n\n"
                        . "Halo *$nama*,\n"
@@ -101,7 +91,6 @@ class SendOverdueNotification extends Command
                 if ($response->successful()) {
                     $this->info("   ✅ Berhasil terkirim!");
                     
-                    // Update status di database jika belum 'terlambat'
                     if ($item->status !== 'terlambat') {
                         $item->update(['status' => 'terlambat']);
                     }
@@ -113,7 +102,7 @@ class SendOverdueNotification extends Command
                 $this->error("   ❌ Error Sistem: " . $e->getMessage());
             }
 
-            // E. Jeda Waktu (PENTING: Agar tidak diblokir WA)
+            // E. Jeda Waktu
             if ($index < $total - 1) {
                 $jeda = rand(4, 7); 
                 $this->comment("   ⏳ Jeda $jeda detik sebelum pesan berikutnya...");

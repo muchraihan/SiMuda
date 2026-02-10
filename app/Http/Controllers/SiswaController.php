@@ -8,10 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SiswaController extends Controller
 {
-    // Tampilkan Form Lengkapi Data
     public function create()
     {
-        // Cek jika sudah punya data, langsung lempar ke halaman lain (misal dashboard/katalog)
         if (Auth::user()->siswa) {
             return redirect()->route('katalog.index')->with('info', 'Data diri Anda sudah lengkap.');
         }
@@ -19,10 +17,8 @@ class SiswaController extends Controller
         return view('siswa.lengkapi_data');
     }
 
-    // Simpan Data ke Database
     public function store(Request $request)
     {
-        // 1. Validasi Input
         $request->validate([
             'nis' => 'required|unique:siswa,nis',
             'kelas' => 'required',
@@ -30,16 +26,14 @@ class SiswaController extends Controller
             'alamat' => 'required',
         ]);
 
-        // 2. Simpan ke Tabel Siswa
         Siswa::create([
-            'user_id' => Auth::id(), // Ambil ID User yang sedang login
+            'user_id' => Auth::id(),
             'nis' => $request->nis,
             'kelas' => $request->kelas,
             'nomor_whatsapp' => $request->nomor_whatsapp,
             'alamat' => $request->alamat,
         ]);
 
-        // 3. Redirect Balik ke Katalog agar bisa pinjam
         return redirect()->route('katalog.index')->with('success', 'Data diri berhasil disimpan! Sekarang Anda bisa meminjam buku.');
     }
 
@@ -50,16 +44,15 @@ class SiswaController extends Controller
         $perPage = $request->input('per_page', 10);
         $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
 
-        $siswa = Siswa::with('user') // Ambil data user (nama/email) sekalian
+        $siswa = Siswa::with('user') 
             ->when($search, function ($query, $search) {
                 return $query->where('nis', 'like', "%{$search}%")
                              ->orWhere('kelas', 'like', "%{$search}%")
                              ->orWhereHas('user', function ($q) use ($search) {
-                                 // Cari berdasarkan nama di tabel users
                                  $q->where('name', 'like', "%{$search}%");
                              });
             })
-            ->orderBy('kelas', 'asc') // Urutkan berdasarkan kelas
+            ->orderBy('kelas', 'asc') 
             ->paginate($perPage)->appends(['per_page' => $perPage, 'search' => $search]);
 
         return view('pustakawan.siswa', compact('siswa', 'search', 'perPage'));
@@ -75,27 +68,22 @@ class SiswaController extends Controller
     public function update(Request $request, $id_siswa)
     {
         $siswa = Siswa::findOrFail($id_siswa);
-        $user  = $siswa->user; // Ambil data user terkait
+        $user  = $siswa->user;
 
-        // Validasi
         $request->validate([
             'name'           => 'required|string|max:255',
-            // Validasi unik email kecuali milik user ini sendiri
             'email'          => 'required|email|unique:users,email,' . $user->id_user . ',id_user',
-            // Validasi unik NIS kecuali milik siswa ini sendiri
             'nis'            => 'required|numeric|unique:siswa,nis,' . $siswa->id_siswa . ',id_siswa',
             'kelas'          => 'required|string',
             'nomor_whatsapp' => 'required|numeric',
             'alamat'         => 'required|string',
         ]);
 
-        // Update Tabel Users (Nama & Email)
         $user->update([
             'name'  => $request->name,
             'email' => $request->email,
         ]);
 
-        // Update Tabel Siswa (Data diri)
         $siswa->update([
             'nis'            => $request->nis,
             'kelas'          => $request->kelas,
@@ -113,15 +101,11 @@ class SiswaController extends Controller
         $siswa = Siswa::findOrFail($id_siswa);
         $user  = $siswa->user;
 
-        // Hapus semua peminjaman terkait siswa terlebih dahulu
         $siswa->peminjaman()->delete();
 
-        // Hapus User (Karena Cascade On Delete di database, data di tabel siswa otomatis ikut terhapus)
-        // Jika tidak setting cascade di migration, hapus $siswa->delete() dulu baru $user->delete()
         if ($user) {
             $user->delete();
         } else {
-            // Jika data user sudah hilang duluan (jarang terjadi), hapus siswanya saja
             $siswa->delete();
         }
 
@@ -132,7 +116,6 @@ class SiswaController extends Controller
     {
         $user = Auth::user();
         
-        // Jika belum punya data siswa, lempar ke form lengkapi data awal
         if (!$user->siswa) {
             return redirect()->route('siswa.create');
         }
@@ -141,7 +124,6 @@ class SiswaController extends Controller
         return view('siswa.profil_saya', compact('siswa'));
     }
 
-    // 2. Simpan Perubahan Data Diri
     public function updateSaya(Request $request)
     {
         $user = Auth::user();
@@ -151,7 +133,6 @@ class SiswaController extends Controller
             'kelas'          => 'required|string',
             'nomor_whatsapp' => 'required|numeric',
             'alamat'         => 'required|string',
-            // NIS biasanya tidak boleh diubah sembarangan oleh siswa, jadi tidak divalidasi/diupdate
         ]);
 
         $siswa->update([

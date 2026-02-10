@@ -15,7 +15,6 @@
                     </button>
 
                     {{-- 2. TOMBOL BUKA SIDEBAR (Desktop Only) --}}
-                    {{-- Default: Hidden. JS akan menampilkannya saat sidebar ditutup --}}
                     <button id="btn-open-sidebar" 
                             class="hidden mr-4 text-gray-500 hover:text-green-700 transition duration-200 transform hover:scale-110"
                             title="Buka Sidebar">

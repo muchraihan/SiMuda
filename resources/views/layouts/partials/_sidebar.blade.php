@@ -1,13 +1,10 @@
-{{-- STYLE TAMBAHAN KHUSUS SIDEBAR --}}
 <style>
-    /* Sembunyikan scrollbar untuk Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
         display: none;
     }
-    /* Sembunyikan scrollbar untuk IE, Edge and Firefox */
     .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 </style>
 
@@ -67,8 +64,7 @@
             </div>
         </div>
 
-        {{-- 3. MENU NAVIGASI (Dengan Class no-scrollbar) --}}
-        {{-- Hapus 'scrollbar-thin' dan ganti dengan 'no-scrollbar' --}}
+        {{-- 3. MENU NAVIGASI --}}
         <nav class="flex-grow p-4 space-y-1.5 overflow-y-auto no-scrollbar">
 
             @if (Auth::user()->peran === 'pustakawan')
@@ -124,7 +120,6 @@
         </nav>
     @endauth
 
-    {{-- Script SweetAlert untuk konfirmasi logout --}}
     @auth
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

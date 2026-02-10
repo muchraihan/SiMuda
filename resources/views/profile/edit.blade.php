@@ -5,28 +5,20 @@
         </h2>
     </x-slot>
 
-    {{-- ============================================================== --}}
-    {{-- NOTIFIKASI SWEETALERT (ANTI ERROR VS CODE) --}}
-    {{-- ============================================================== --}}
-    
-    <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
     <div id="flash-data" 
          data-status="{{ session('status') }}" 
          data-success="{{ session('success') }}" 
          data-error="{{ session('error') }}">
     </div>
 
-    <!-- 2. Library SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 3. Script JS Murni -->
     <script>
         const flashData = document.getElementById('flash-data');
         const status = flashData.dataset.status;
         const successMsg = flashData.dataset.success;
         const errorMsg = flashData.dataset.error;
 
-        // Cek Status Bawaan Breeze
         if (status === 'profile-updated') {
             Swal.fire({
                 title: 'Berhasil!',
@@ -45,7 +37,6 @@
             });
         }
         
-        // Cek Pesan Sukses Custom
         else if (successMsg) {
             Swal.fire({
                 title: 'Berhasil!',
@@ -56,7 +47,6 @@
             });
         }
 
-        // Cek Pesan Error (Misal: Gagal Hapus Akun karena masih pinjam buku)
         if (errorMsg) {
             Swal.fire({
                 title: 'Gagal!',
@@ -67,28 +57,24 @@
             });
         }
     </script>
-    {{-- ============================================================== --}}
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
-            {{-- Update Profil (Border Hijau) --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg border border-gray-200 border-t-4 border-t-green-500">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            {{-- Update Password (Border Biru) --}}
-            {{-- Saya hapus 'dark:bg-gray-800' agar backgroundnya Putih Bersih --}}
+
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg border border-gray-200 border-t-4 border-t-blue-500">
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            {{-- Delete User (Border Merah) --}}
-            {{-- Saya hapus 'dark:bg-gray-800' agar backgroundnya Putih Bersih --}}
+
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg border border-gray-200 border-t-4 border-t-red-500">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')

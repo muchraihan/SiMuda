@@ -1,31 +1,23 @@
 <x-app-layout>
-    {{-- Slot untuk judul halaman yang akan muncul di header --}}
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Manajemen Buku') }}
         </h2>
     </x-slot>
 
-    {{-- ============================================================== --}}
-    {{-- NOTIFIKASI SWEETALERT --}}
-    {{-- ============================================================== --}}
-    
-    <!-- 1. Simpan pesan Session di dalam DIV tersembunyi sebagai atribut -->
+
     <div id="flash-data" 
          data-success="{{ session('success') }}" 
          data-error="{{ session('error') }}">
     </div>
 
-    <!-- 2. Library SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 3. Script JS Murni -->
     <script>
         const flashData = document.getElementById('flash-data');
         const successMsg = flashData.dataset.success;
         const errorMsg = flashData.dataset.error;
 
-        // Cek Pesan Sukses
         if (successMsg) {
             Swal.fire({
                 title: 'Berhasil!',
@@ -36,7 +28,6 @@
             });
         }
 
-        // Cek Pesan Error
         if (errorMsg) {
             Swal.fire({
                 title: 'Gagal!',
@@ -47,7 +38,6 @@
             });
         }
 
-        // Function untuk konfirmasi hapus buku
         function confirmDelete(id, judul) {
             Swal.fire({
                 title: 'Konfirmasi Hapus',
@@ -65,7 +55,6 @@
             });
         }
     </script>
-    {{-- ============================================================== --}}
 
     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
         <div class="p-6 text-gray-900">
@@ -126,7 +115,6 @@
                                 <td class="py-3 px-4">{{ $item->jumlah_stok }}</td>
                                 <td class="py-3 px-4">
                                     <div class="flex justify-center space-x-2">
-                                        {{-- Tombol Edit --}}
                                         <a href="{{ route('pustakawan.buku.edit', $item->id_buku) }}" 
                                            class="text-blue-500 hover:text-blue-700 p-1" title="Edit">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -137,7 +125,6 @@
                                             </svg>
                                         </a>
 
-                                        {{-- Tombol Hapus --}}
                                         <form id="delete-form-{{ $item->id_buku }}" action="{{ route('pustakawan.buku.destroy', $item->id_buku) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
@@ -164,7 +151,6 @@
                 </table>
             </div>
 
-            {{-- Bagian Paginasi (Navigasi Halaman) --}}
             <div class="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <span class="text-sm text-gray-600 order-2 sm:order-1">
                     Menampilkan <span class="font-semibold text-gray-800">{{ $buku->firstItem() }}</span>
@@ -172,7 +158,6 @@
                     dari <span class="font-semibold text-gray-800">{{ $buku->total() }}</span> hasil
                 </span>
 
-                {{-- Navigasi Halaman dan Pilihan Per Page --}}
                 <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 order-1 sm:order-2">
                     <form action="{{ route('pustakawan.buku.index') }}" method="GET" class="flex items-center space-x-2">
                         <input type="hidden" name="search" value="{{ $search ?? '' }}">

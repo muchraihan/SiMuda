@@ -5,11 +5,7 @@
             {{ __('Manajemen Peminjaman') }}
         </h2>
     </x-slot>
-
-    {{-- ============================================================== --}}
-    {{-- NOTIFIKASI SWEETALERT --}}
-    {{-- ============================================================== --}}
-    
+    {{-- Notifikasi Flash Message --}}
     <div id="flash-data" 
          data-success="{{ session('success') }}" 
          data-error="{{ session('error') }}">
@@ -40,7 +36,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- BAGIAN 1: TABEL APPROVAL (TIDAK ADA PAGINASI SESUAI REQUEST) --}}
+            {{-- BAGIAN 1: TABEL PERMINTAAN PEMINJAMAN BARU --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-yellow-400">
                 <div class="p-6 text-gray-900">
                     <div class="flex justify-between items-center mb-4">
@@ -70,7 +66,6 @@
                                     <td class="py-3 px-4">{{ $req->buku->judul }}</td>
                                     <td class="py-3 px-4 text-sm">{{ \Carbon\Carbon::parse($req->tgl_pengajuan)->format('d M Y') }}</td>
                                     <td class="py-3 px-4 text-center">
-                                        {{-- Tombol Buka Modal --}}
                                         <button onclick="openModal('modal-{{ $req->id_peminjaman }}')" 
                                                 class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded shadow hover:shadow-md transition">
                                             🔍 Cek Detail

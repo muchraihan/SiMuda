@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
 
-    {{-- Notifikasi SweetAlert (Sama seperti halaman lain) --}}
     <div id="flash-data" data-success="{{ session('success') }}" data-error="{{ session('error') }}"></div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -22,7 +21,6 @@
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                         <h3 class="text-2xl font-bold text-gray-800">Daftar Admin Pustakawan</h3>
                         
-                        {{-- Tombol Tambah --}}
                         <a href="{{ route('pustakawan.akun.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -31,7 +29,6 @@
                         </a>
                     </div>
 
-                    {{-- Tabel --}}
                     <div class="overflow-x-auto border border-gray-200 rounded-lg">
                         <table class="min-w-full bg-white">
                             <thead class="bg-gray-800 text-white">
@@ -53,7 +50,6 @@
                                         {{ $admin->created_at->format('d M Y') }}
                                     </td>
                                     <td class="py-3 px-4 text-center">
-                                        {{-- Jangan izinkan hapus diri sendiri --}}
                                         @if(auth()->id() !== $admin->id_user)
                                             <form action="{{ route('pustakawan.akun.destroy', $admin->id_user) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus admin ini?');">
                                                 @csrf

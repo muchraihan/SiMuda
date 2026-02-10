@@ -24,7 +24,6 @@ class DashboardController extends Controller
         // --- DATA KHUSUS SISWA (RIWAYAT SAYA) ---
         $riwayatSaya = 0;
         if (Auth::user()->peran == 'siswa' && Auth::user()->siswa) {
-            // Hitung semua transaksi milik siswa ini (active & history)
             $riwayatSaya = Peminjaman::where('id_siswa', Auth::user()->siswa->id_siswa)->count();
         }
 
@@ -33,7 +32,7 @@ class DashboardController extends Controller
             'jumlahSiswa', 
             'jumlahPeminjaman', 
             'jumlahTerlambat',
-            'riwayatSaya' // <--- Kirim variabel baru ini
+            'riwayatSaya'
         ));
     }
 }

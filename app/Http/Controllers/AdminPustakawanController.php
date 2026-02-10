@@ -58,15 +58,10 @@ class AdminPustakawanController extends Controller
         // Ambil user yang sedang login menggunakan Facade Auth
         $currentUser = Auth::user();
 
-        // Cek apakah user mencoba menghapus dirinya sendiri
-        // Kita akses atribut 'id_user' secara langsung
         if ($currentUser && $currentUser->id_user == $id) {
             return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri saat sedang login.');
         }
 
-        // PERBAIKAN UTAMA:
-        // Gunakan where()->delete() agar tidak bergantung pada konfigurasi primaryKey di Model User.
-        // Ini menghindari error "Unknown column 'id'" jika Model masih default.
         $deleted = User::where('id_user', $id)->delete();
 
         if ($deleted) {
