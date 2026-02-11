@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Buku;
 use App\Models\Siswa;
 use App\Models\Peminjaman;
-use Illuminate\Support\Facades\Auth; // <--- Jangan lupa import Auth
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {

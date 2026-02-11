@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Auth; // Tambahkan Import Facade Auth
+use Illuminate\Support\Facades\Auth;
 
 class AdminPustakawanController extends Controller
 {

@@ -73,7 +73,7 @@ class SendOverdueNotification extends Command
                        . "📅 Jatuh Tempo: *$tgl*\n"
                        . "❗ Telat: *" . number_format($telat, 0, ',', '.') . " Hari*\n"
                        . "💰 *Total Denda: Rp $dendaFormatted*\n\n"
-                       . "Mohon **SEGERA** kembalikan buku ke perpustakaan.\n"
+                       . "Mohon *SEGERA* kembalikan buku ke perpustakaan.\n"
                        . "_SiMuda Library_";
 
                 // C. Kirim Request ke Fontee

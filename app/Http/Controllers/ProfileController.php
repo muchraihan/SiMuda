@@ -49,7 +49,6 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // [LOGIKA BARU: CEK PEMINJAMAN SEBELUM HAPUS]
         if ($user->siswa) {
             $adaPeminjaman = Peminjaman::where('id_siswa', $user->siswa->id_siswa)->exists();
 

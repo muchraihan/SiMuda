@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Denda; // Pastikan Model Denda diimport
+use App\Models\Denda;
 use Carbon\Carbon;
 
 class DendaController extends Controller
