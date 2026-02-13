@@ -46,7 +46,7 @@ class AdminPustakawanController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'peran' => 'pustakawan', // KUNCI: Set peran jadi pustakawan
+            'peran' => 'pustakawan',
         ]);
 
         return redirect()->route('pustakawan.akun.index')->with('success', 'Akun Pustakawan berhasil ditambahkan!');

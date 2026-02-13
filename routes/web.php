@@ -65,6 +65,8 @@ Route::middleware(['auth', 'peran:pustakawan'])->prefix('pustakawan')->group(fun
 
     // 2. Manajemen Siswa
     Route::get('/kelolasiswa', [SiswaController::class, 'index'])->name('pustakawan.siswa.index');
+        Route::get('/kelolasiswa/import', [SiswaController::class, 'importView'])->name('pustakawan.siswa.import');
+    Route::post('/kelolasiswa/import', [SiswaController::class, 'importStore'])->name('pustakawan.siswa.import.store');
     Route::get('/kelolasiswa/{id_siswa}/edit', [SiswaController::class, 'edit'])->name('pustakawan.siswa.edit');
     Route::put('/kelolasiswa/{id_siswa}', [SiswaController::class, 'update'])->name('pustakawan.siswa.update');
     Route::delete('/kelolasiswa/{id_siswa}', [SiswaController::class, 'destroy'])->name('pustakawan.siswa.destroy');
@@ -97,6 +99,8 @@ Route::middleware(['auth', 'peran:pustakawan'])->prefix('pustakawan')->group(fun
     Route::get('/akun/create', [AdminPustakawanController::class, 'create'])->name('pustakawan.akun.create');
     Route::post('/akun', [AdminPustakawanController::class, 'store'])->name('pustakawan.akun.store');
     Route::delete('/akun/{id_user}', [AdminPustakawanController::class, 'destroy'])->name('pustakawan.akun.destroy');
+
+
 
     
 });

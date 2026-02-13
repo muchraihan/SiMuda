@@ -39,14 +39,13 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'peran' => 'siswa', // <--- PENTING: Tambahkan baris ini manual
+            'peran' => 'siswa',
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // Redirect ke dashboard atau langsung ke katalog
         return redirect(route('katalog.index', absolute: false));
     }
 }

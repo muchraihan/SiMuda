@@ -58,7 +58,7 @@ class SendOverdueNotification extends Command
                 $tglKembali = Carbon::parse($item->tgl_kembali_maksimal);
                 $sekarang = Carbon::now();
 
-                // Hitung selisih hari secara absolut (positif)
+                // Hitung selisih hari secara absolut
                 $telat = abs($tglKembali->diffInDays($sekarang, false));
                 
                 $telat = $telat < 1 ? 1 : round($telat);

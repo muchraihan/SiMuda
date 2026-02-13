@@ -116,6 +116,14 @@
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
+                    <!-- Forgot Password Link -->
+                    <div class="flex justify-end">
+                        <a href="{{ route('password.request') }}"
+                           class="text-sm font-medium text-green-600 hover:text-green-700 transition duration-200">
+                            Lupa kata sandi?
+                        </a>
+                    </div>
+
                     <!-- Submit Button -->
                     <div>
                         <button type="submit"
@@ -144,12 +152,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-6">
+                    {{-- <div class="mt-6">
                         <a href="{{ route('register') }}"
                            class="w-full flex justify-center py-3 px-4 border-2 border-green-600 rounded-lg text-sm font-bold text-green-600 bg-transparent hover:bg-green-50 transition duration-200">
                             Buat Akun Baru
                         </a>
-                    </div>
+                    </div> --}}
                 </div>
 
             </div>

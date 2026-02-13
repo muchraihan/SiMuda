@@ -70,7 +70,11 @@
                     {{-- Tombol Tambah dan Form Pencarian --}}
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                         
-                        <div></div> 
+                        <div>
+                            <a href="{{ route('pustakawan.siswa.import') }}" class="bg-green-600 text-white px-4 py-2 rounded-md font-bold text-sm hover:bg-green-700">
+                                + Import Excel
+                            </a>    
+                        </div> 
                         
                         {{-- Form Pencarian --}}
                         <form action="{{ route('pustakawan.siswa.index') }}" method="GET" class="w-full sm:w-auto flex items-center">
